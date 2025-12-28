@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.Netcode;
 
-public class UnitController : MonoBehaviour
+public class UnitController : NetworkBehaviour
 {
     [Header("Stats")]
     public float maxHP = 100f;
@@ -24,6 +25,8 @@ public class UnitController : MonoBehaviour
 
     void Update()
     {
+        if(!IsServer) return;
+
         if (currentTarget == null || currentTarget.IsDead())
         {
             FindTarget();
@@ -100,6 +103,8 @@ public class UnitController : MonoBehaviour
 
     void Die()
     {
-        Destroy(gameObject);
+        if (!IsServer) return;
+
+        GetComponent<NetworkObject>().Despawn(true);
     }
 }
