@@ -5,8 +5,17 @@ public class BoardSlot : MonoBehaviour
     public bool occupied;
     public UnitController currentUnit;
 
-    public Vector3 GetSnapPosition()
+    public Vector3 SnapPosition => transform.position;
+
+    public void Assign(UnitController unit)
     {
-        return transform.position;
+        occupied = true;
+        currentUnit = unit;
+    }
+
+    public void Clear()
+    {
+        occupied = false;
+        currentUnit = null;
     }
 }

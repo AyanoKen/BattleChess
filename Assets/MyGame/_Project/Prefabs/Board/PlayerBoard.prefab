@@ -1216,6 +1216,7 @@ GameObject:
   - component: {fileID: 2155465380359548262}
   - component: {fileID: 4719617210345466233}
   - component: {fileID: 7880980335914940023}
+  - component: {fileID: -8822135365175190865}
   m_Layer: 0
   m_Name: PlayerBoard
   m_TagString: Untagged
@@ -1254,7 +1255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 610054308
+  GlobalObjectIdHash: 1716584170
   InScenePlacedSourceGlobalObjectIdHash: 1716584170
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1275,6 +1276,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d39f80dc7d447f46bab87a72bc2305b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8822135365175190865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6899958575521973509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46ef9926aa19eeb47a4360f36284f9de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  benchSlots: []
 --- !u!1 &7290671251454910875
 GameObject:
   m_ObjectHideFlags: 0
