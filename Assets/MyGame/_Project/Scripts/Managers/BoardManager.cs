@@ -62,4 +62,33 @@ public class BoardManager : NetworkBehaviour
         boardsByClient.TryGetValue(clientId, out PlayerBoard board);
         return board;
     }
+
+    public void ValidateAndPlaceUnit(UnitController unit, Vector3 dropPosition)
+    {
+        if (!IsServer) return;
+
+        PlayerBoard board = GetBoardForClient(unit.OwnerClientId);
+        if (board == null) return;
+
+        if (board.IsInsideBoard(dropPosition) || board.IsInsideBench(dropPosition))
+        {
+            Vector3 correctedPos = dropPosition;
+            correctedPos.y += unit.GetPlacementYOffset();
+            unit.transform.position = correctedPos;
+            return;
+        }
+
+        RevertUnit(unit);
+    }
+
+    void RevertUnit(UnitController unit)
+    {
+        if (unit.CurrentSlot == null)
+            return;
+
+        Vector3 pos = unit.CurrentSlot.SnapPosition;
+        pos.y += unit.GetPlacementYOffset();
+        unit.transform.position = pos;
+    }
+
 }

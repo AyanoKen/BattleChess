@@ -11,6 +11,9 @@ public class UnitController : NetworkBehaviour
     public float attackCooldown = 1.2f;
     public int teamId = 0;
 
+    [HideInInspector]
+    public BoardSlot CurrentSlot;
+
     private float currentHP;
     private float attackTimer;
 
@@ -26,6 +29,8 @@ public class UnitController : NetworkBehaviour
     void Update()
     {
         if(!IsServer) return;
+
+        if(true) return; //Fix later when adding battole and prep phase
 
         if (currentTarget == null || currentTarget.IsDead())
         {
@@ -106,5 +111,29 @@ public class UnitController : NetworkBehaviour
         if (!IsServer) return;
 
         GetComponent<NetworkObject>().Despawn(true);
+    }
+
+    public float GetPlacementYOffset()
+    {
+        Collider col = GetComponent<Collider>();
+        if (col == null)
+            return 0f;
+
+        return col.bounds.extents.y;
+    }
+
+    public void SnapToSlot(BoardSlot slot)
+    {
+        if (CurrentSlot != null)
+        {
+            CurrentSlot.Clear();
+        }
+
+        CurrentSlot = slot;
+        slot.Assign(this);
+
+        Vector3 pos = slot.SnapPosition;
+        pos.y += GetPlacementYOffset();
+        transform.position = pos;
     }
 }

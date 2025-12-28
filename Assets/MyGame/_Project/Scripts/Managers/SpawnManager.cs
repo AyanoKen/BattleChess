@@ -43,10 +43,14 @@ public class SpawnManager : NetworkBehaviour
         var agent = pawn.GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.enabled = false;
 
+        Vector3 correctedPos = slot.SnapPosition;
+        correctedPos.y += unit.GetPlacementYOffset();
+        pawn.transform.position = correctedPos;
+
         pawn.GetComponent<NetworkObject>()
             .SpawnWithOwnership(board.OwnerClientId);
 
-        slot.Assign(unit);
+        unit.SnapToSlot(slot);
     }
 
 }
