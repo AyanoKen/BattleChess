@@ -4,12 +4,15 @@ public class SpawnButton : MonoBehaviour
 {
     public void SpawnPawn()
     {
-        if (SpawnManager.Instance == null)
+        SpawnManager spawnManager = FindObjectOfType<SpawnManager>();
+
+        if (spawnManager == null)
         {
-            Debug.LogError("SpawnManager not found");
+            Debug.LogError("SpawnManager not found in scene");
             return;
         }
 
-        SpawnManager.Instance.RequestSpawnPawnServerRpc();
+        spawnManager.RequestSpawnPawnServerRpc();
     }
 }
+

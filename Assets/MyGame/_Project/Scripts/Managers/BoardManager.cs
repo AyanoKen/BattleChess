@@ -6,49 +6,60 @@ public class BoardManager : NetworkBehaviour
 {
     [SerializeField] private GameObject boardPrefab;
 
-    private HashSet<ulong> spawnedBoards = new HashSet<ulong>();
+    private readonly Dictionary<ulong, PlayerBoard> boardsByClient =
+        new Dictionary<ulong, PlayerBoard>();
 
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
 
-        // Spawn for host
         foreach (ulong clientId in NetworkManager.ConnectedClientsIds)
         {
-            TrySpawnBoard(clientId);
+            SpawnBoardForClient(clientId);
         }
 
-        // Listen for late-joining clients
-        NetworkManager.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.OnClientConnectedCallback += SpawnBoardForClient;
     }
 
     public override void OnDestroy()
     {
         if (NetworkManager.Singleton != null)
         {
-            NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+            NetworkManager.OnClientConnectedCallback -= SpawnBoardForClient;
         }
 
         base.OnDestroy();
     }
 
-    void OnClientConnected(ulong clientId)
+    void SpawnBoardForClient(ulong clientId)
     {
-        TrySpawnBoard(clientId);
-    }
-
-    void TrySpawnBoard(ulong clientId)
-    {
-        if (spawnedBoards.Contains(clientId))
+        if (boardsByClient.ContainsKey(clientId))
             return;
 
-        GameObject board = Instantiate(boardPrefab);
+        GameObject boardGO = Instantiate(boardPrefab);
 
-        board.GetComponent<NetworkObject>()
-             .SpawnWithOwnership(clientId);
+        boardGO.transform.position = GetBoardPosition(clientId);
 
-        spawnedBoards.Add(clientId);
+        NetworkObject netObj = boardGO.GetComponent<NetworkObject>();
+        netObj.SpawnWithOwnership(clientId);
+
+        PlayerBoard board = boardGO.GetComponent<PlayerBoard>();
+        boardsByClient.Add(clientId, board);
 
         Debug.Log($"Spawned board for client {clientId}");
+    }
+
+    Vector3 GetBoardPosition(ulong clientId)
+    {
+        if (clientId == NetworkManager.ServerClientId)
+            return Vector3.zero;
+
+        return new Vector3(0, 0, 300); 
+    }
+
+    public PlayerBoard GetBoardForClient(ulong clientId)
+    {
+        boardsByClient.TryGetValue(clientId, out PlayerBoard board);
+        return board;
     }
 }

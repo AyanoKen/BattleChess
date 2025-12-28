@@ -1,24 +1,18 @@
 using Unity.Netcode;
 using UnityEngine;
-using System.Linq;
 
 public class SpawnManager : NetworkBehaviour
 {
-    public static SpawnManager Instance;
-
     [SerializeField] private GameObject pawnPrefab;
-
-    void Awake()
-    {
-        Instance = this;
-    }
 
     [ServerRpc(RequireOwnership = false)]
     public void RequestSpawnPawnServerRpc(ServerRpcParams rpcParams = default)
     {
         ulong clientId = rpcParams.Receive.SenderClientId;
 
-        PlayerBoard board = FindBoardForClient(clientId);
+        BoardManager boardManager = FindObjectOfType<BoardManager>();
+        PlayerBoard board = boardManager.GetBoardForClient(clientId);
+
         if (board == null)
         {
             Debug.LogError($"No board found for client {clientId}");
@@ -35,12 +29,6 @@ public class SpawnManager : NetworkBehaviour
         SpawnPawn(board, slot);
     }
 
-    PlayerBoard FindBoardForClient(ulong clientId)
-    {
-        return FindObjectsOfType<PlayerBoard>()
-            .FirstOrDefault(board => board.OwnerClientId == clientId);
-    }
-
     void SpawnPawn(PlayerBoard board, BoardSlot slot)
     {
         GameObject pawn = Instantiate(
@@ -52,9 +40,13 @@ public class SpawnManager : NetworkBehaviour
         var unit = pawn.GetComponent<UnitController>();
         unit.teamId = board.OwnerClientId == NetworkManager.ServerClientId ? 0 : 1;
 
-        NetworkObject netObj = pawn.GetComponent<NetworkObject>();
-        netObj.SpawnWithOwnership(board.OwnerClientId);
+        var agent = pawn.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        agent.enabled = false;
+
+        pawn.GetComponent<NetworkObject>()
+            .SpawnWithOwnership(board.OwnerClientId);
 
         slot.Assign(unit);
     }
+
 }
