@@ -1,0 +1,34 @@
+using Unity.Netcode;
+using UnityEngine;
+
+public class CameraController : MonoBehaviour
+{
+    void Start()
+    {
+        if (!NetworkManager.Singleton.IsClient) return;
+
+        Invoke(nameof(PositionCamera), 0.2f);
+    }
+
+    void PositionCamera()
+    {
+        foreach (var board in FindObjectsOfType<PlayerBoard>())
+        {
+            if (board.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            {
+                MoveCameraToBoard(board);
+                return;
+            }
+        }
+
+        Debug.LogWarning("Local board not found yet");
+    }
+
+    void MoveCameraToBoard(PlayerBoard board)
+    {
+        Camera.main.transform.position =
+            board.transform.position + new Vector3(0, 10, -10);
+
+        Camera.main.transform.LookAt(board.transform.position);
+    }
+}

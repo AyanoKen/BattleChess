@@ -1,37 +1,54 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BoardManager : NetworkBehaviour
 {
-    public static BoardManager Instance;
-
     [SerializeField] private GameObject boardPrefab;
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    private HashSet<ulong> spawnedBoards = new HashSet<ulong>();
 
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
 
+        // Spawn for host
         foreach (ulong clientId in NetworkManager.ConnectedClientsIds)
         {
-            SpawnBoardForClient(clientId);
+            TrySpawnBoard(clientId);
         }
+
+        // Listen for late-joining clients
+        NetworkManager.OnClientConnectedCallback += OnClientConnected;
     }
 
-    void SpawnBoardForClient(ulong clientId)
+    public override void OnDestroy()
     {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+        }
+
+        base.OnDestroy();
+    }
+
+    void OnClientConnected(ulong clientId)
+    {
+        TrySpawnBoard(clientId);
+    }
+
+    void TrySpawnBoard(ulong clientId)
+    {
+        if (spawnedBoards.Contains(clientId))
+            return;
+
         GameObject board = Instantiate(boardPrefab);
 
-        int teamId = clientId == NetworkManager.ServerClientId ? 0 : 1;
+        board.GetComponent<NetworkObject>()
+             .SpawnWithOwnership(clientId);
 
-        board.transform.position = teamId == 0
-            ? new Vector3(0, 0, 0)
-            : new Vector3(0, 0, 100);
+        spawnedBoards.Add(clientId);
 
-        board.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+        Debug.Log($"Spawned board for client {clientId}");
     }
 }
