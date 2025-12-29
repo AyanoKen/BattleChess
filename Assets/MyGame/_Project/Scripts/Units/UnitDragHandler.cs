@@ -4,6 +4,7 @@ using Unity.Netcode.Components;
 
 public class UnitDragHandler : NetworkBehaviour
 {
+    
     private Camera cam;
     private bool dragging;
     private Vector3 dragOffset;
@@ -46,13 +47,14 @@ public class UnitDragHandler : NetworkBehaviour
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            var unit = GetComponent<UnitController>();
+            BoardSlot slot = hit.collider.GetComponent<BoardSlot>();
+            if (slot == null)
+            {
+                SubmitDropServerRpc(-1);
+                return;
+            }
 
-            Vector3 correctedPos = hit.point;
-            correctedPos.y += unit.GetPlacementYOffset();
-            transform.position = correctedPos;
-
-            SubmitDropServerRpc(hit.point);
+            SubmitDropServerRpc(slot.slotIndex);
         }
         
     }
@@ -71,9 +73,11 @@ public class UnitDragHandler : NetworkBehaviour
     }
 
     [ServerRpc]
-    void SubmitDropServerRpc(Vector3 dropPosition)
+    void SubmitDropServerRpc(int slotIndex)
     {
+        UnitController unit = GetComponent<UnitController>();
         BoardManager boardManager = FindObjectOfType<BoardManager>();
-        boardManager.ValidateAndPlaceUnit(this.GetComponent<UnitController>(), dropPosition);
+
+        boardManager.TryPlaceUnit(unit, slotIndex);
     }
 }

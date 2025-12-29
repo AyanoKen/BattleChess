@@ -4,7 +4,7 @@ public class BoardSlot : MonoBehaviour
 {
     public bool occupied;
     public UnitController currentUnit;
-
+    public int slotIndex;
     public Vector3 SnapPosition => transform.position;
 
     public enum SlotType

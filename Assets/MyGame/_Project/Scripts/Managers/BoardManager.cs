@@ -64,7 +64,7 @@ public class BoardManager : NetworkBehaviour
         return board;
     }
 
-    public void ValidateAndPlaceUnit(UnitController unit, Vector3 dropPosition)
+    public void TryPlaceUnit(UnitController unit, int slotIndex)
     {
         if (!IsServer) return;
 
@@ -75,34 +75,21 @@ public class BoardManager : NetworkBehaviour
             return;
         }
 
-        Vector3 flatPos = dropPosition;
-        flatPos.y = board.transform.position.y;
-
-        if (board.IsInsideBoard(flatPos))
+        if (slotIndex < 0)
         {
-            if (unit.CurrentSlot != null)
-            {
-                unit.CurrentSlot.Clear();
-                unit.CurrentSlot = null;
-            }
-
-            Vector3 correctedPos = flatPos;
-            correctedPos.y += unit.GetPlacementYOffset();
-            unit.transform.position = correctedPos;
+            RevertUnit(unit);
             return;
         }
 
-        if (board.IsInsideBench(flatPos))
+        BoardSlot targetSlot = board.GetSlotByIndex(slotIndex);
+        if (targetSlot == null || targetSlot.occupied)
         {
-            Vector3 correctedPos = flatPos;
-            correctedPos.y += unit.GetPlacementYOffset();
-            unit.transform.position = correctedPos;
+            RevertUnit(unit);
             return;
         }
 
-        RevertUnit(unit);
+        unit.SnapToSlot(targetSlot);
     }
-
 
     void RevertUnit(UnitController unit)
     {

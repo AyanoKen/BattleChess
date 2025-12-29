@@ -6,25 +6,30 @@ public class PlayerBoard : NetworkBehaviour
 {
     [Header("Bench")]
     public BoardSlot[] benchSlots;
-
-    public Collider boardBounds;
-    public Collider benchBounds;
+    
+    public BoardSlot[] boardSlots; 
 
     void Awake()
     {
-        if (boardBounds == null)
-        {
-            boardBounds = transform.Find("BoardBounds").GetComponent<Collider>();
-        }
-
-        if (benchBounds != null)
-        {
-            benchBounds = transform.Find("BenchBounds")?.GetComponent<Collider>();   
-        }
-
         benchSlots = GetComponentsInChildren<BoardSlot>()
-            .Where(slot => slot.gameObject.name.Contains("Bench"))
+            .Where(slot => slot.slotType == BoardSlot.SlotType.Bench)
             .ToArray();
+
+        for (int i = 0; i < benchSlots.Length; i++)
+        {
+            benchSlots[i].slotIndex = i;
+        }
+
+        boardSlots = GetComponentsInChildren<BoardSlot>()
+            .Where(slot => slot.slotType == BoardSlot.SlotType.Board)
+            .ToArray();
+
+        int boardOffset = benchSlots.Length;
+
+        for (int i = 0; i < boardSlots.Length; i++)
+        {
+            boardSlots[i].slotIndex = boardOffset + i;
+        }
     }
 
     public BoardSlot GetFreeBenchSlot()
@@ -32,17 +37,20 @@ public class PlayerBoard : NetworkBehaviour
         return benchSlots.FirstOrDefault(slot => !slot.occupied);
     }
 
-    public bool IsInsideBoard(Vector3 pos)
+    public BoardSlot GetSlotByIndex(int index)
     {
-        Vector3 min = boardBounds.bounds.min;
-        Vector3 max = boardBounds.bounds.max;
+        foreach (var slot in benchSlots)
+        {
+            if (slot.slotIndex == index)
+                return slot;
+        }
 
-        return pos.x >= min.x && pos.x <= max.x
-            && pos.z >= min.z && pos.z <= max.z;
-    }
+        foreach (var slot in boardSlots)
+        {
+            if (slot.slotIndex == index)
+                return slot;
+        }
 
-    public bool IsInsideBench(Vector3 pos)
-    {
-        return benchBounds != null && benchBounds.bounds.Contains(pos);
+        return null;
     }
 }
