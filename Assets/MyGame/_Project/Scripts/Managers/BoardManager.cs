@@ -78,11 +78,24 @@ public class BoardManager : NetworkBehaviour
         Vector3 flatPos = dropPosition;
         flatPos.y = board.transform.position.y;
 
-        if (board.IsInsideBoard(flatPos) || board.IsInsideBench(flatPos))
+        if (board.IsInsideBoard(flatPos))
+        {
+            if (unit.CurrentSlot != null)
+            {
+                unit.CurrentSlot.Clear();
+                unit.CurrentSlot = null;
+            }
+
+            Vector3 correctedPos = flatPos;
+            correctedPos.y += unit.GetPlacementYOffset();
+            unit.transform.position = correctedPos;
+            return;
+        }
+
+        if (board.IsInsideBench(flatPos))
         {
             Vector3 correctedPos = flatPos;
             correctedPos.y += unit.GetPlacementYOffset();
-
             unit.transform.position = correctedPos;
             return;
         }

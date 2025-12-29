@@ -7,6 +7,14 @@ public class BoardSlot : MonoBehaviour
 
     public Vector3 SnapPosition => transform.position;
 
+    public enum SlotType
+    {
+        Bench, 
+        Board
+    }
+
+    public SlotType slotType;
+
     public void Assign(UnitController unit)
     {
         occupied = true;
