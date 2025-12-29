@@ -40,17 +40,19 @@ public class UnitDragHandler : NetworkBehaviour
     void OnMouseUp()
     {
         if (!IsOwner) return;
+
         dragging = false;
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            SubmitDropServerRpc(hit.point);
-        }
+            var unit = GetComponent<UnitController>();
 
-        if (netTransform != null)
-        {
-            netTransform.enabled = true;
+            Vector3 correctedPos = hit.point;
+            correctedPos.y += unit.GetPlacementYOffset();
+            transform.position = correctedPos;
+
+            SubmitDropServerRpc(hit.point);
         }
         
     }

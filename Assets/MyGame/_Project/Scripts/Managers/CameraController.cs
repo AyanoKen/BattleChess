@@ -27,7 +27,7 @@ public class CameraController : MonoBehaviour
     void MoveCameraToBoard(PlayerBoard board)
     {
         Camera.main.transform.position =
-            board.transform.position + new Vector3(0, 10, -10);
+            board.transform.position + new Vector3(10, 10, 0);
 
         Camera.main.transform.LookAt(board.transform.position);
     }

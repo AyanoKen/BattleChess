@@ -34,7 +34,11 @@ public class PlayerBoard : NetworkBehaviour
 
     public bool IsInsideBoard(Vector3 pos)
     {
-        return boardBounds.bounds.Contains(pos);
+        Vector3 min = boardBounds.bounds.min;
+        Vector3 max = boardBounds.bounds.max;
+
+        return pos.x >= min.x && pos.x <= max.x
+            && pos.z >= min.z && pos.z <= max.z;
     }
 
     public bool IsInsideBench(Vector3 pos)

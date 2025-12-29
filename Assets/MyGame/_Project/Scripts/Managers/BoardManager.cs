@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode.Components;
 
 public class BoardManager : NetworkBehaviour
 {
@@ -68,12 +69,20 @@ public class BoardManager : NetworkBehaviour
         if (!IsServer) return;
 
         PlayerBoard board = GetBoardForClient(unit.OwnerClientId);
-        if (board == null) return;
-
-        if (board.IsInsideBoard(dropPosition) || board.IsInsideBench(dropPosition))
+        if (board == null)
         {
-            Vector3 correctedPos = dropPosition;
+            RevertUnit(unit);
+            return;
+        }
+
+        Vector3 flatPos = dropPosition;
+        flatPos.y = board.transform.position.y;
+
+        if (board.IsInsideBoard(flatPos) || board.IsInsideBench(flatPos))
+        {
+            Vector3 correctedPos = flatPos;
             correctedPos.y += unit.GetPlacementYOffset();
+
             unit.transform.position = correctedPos;
             return;
         }
@@ -81,14 +90,55 @@ public class BoardManager : NetworkBehaviour
         RevertUnit(unit);
     }
 
+
     void RevertUnit(UnitController unit)
     {
         if (unit.CurrentSlot == null)
             return;
 
-        Vector3 pos = unit.CurrentSlot.SnapPosition;
-        pos.y += unit.GetPlacementYOffset();
-        unit.transform.position = pos;
+        Vector3 correctedPos = unit.CurrentSlot.SnapPosition;
+        correctedPos.y += unit.GetPlacementYOffset();
+
+        unit.transform.position = correctedPos;
+
+        RevertUnitClientRpc(
+            unit.NetworkObjectId,
+            correctedPos,
+            new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { unit.OwnerClientId }
+                }
+            });
+    }
+
+
+    [ClientRpc]
+    void EnableNetworkTransformClientRpc(
+        ulong unitNetworkId,
+        ClientRpcParams rpcParams = default)
+    {
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(unitNetworkId, out var netObj))
+            return;
+
+        var netTransform = netObj.GetComponent<NetworkTransform>();
+        if (netTransform != null)
+            netTransform.enabled = true;
+    }
+
+    [ClientRpc]
+    void RevertUnitClientRpc(
+        ulong unitNetworkId,
+        Vector3 revertPosition,
+        ClientRpcParams rpcParams = default)
+    {
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(unitNetworkId, out var netObj))
+            return;
+
+        netObj.transform.position = revertPosition;
     }
 
 }
