@@ -69,49 +69,40 @@ public class BoardManager : NetworkBehaviour
         if (!IsServer) return;
 
         PlayerBoard board = GetBoardForClient(unit.OwnerClientId);
-        if (board == null)
+        if (board == null || slotIndex < 0)
         {
             RevertUnit(unit);
             return;
         }
 
-        if (slotIndex < 0)
+        BoardSlot slot = board.GetSlotByIndex(slotIndex);
+        if (slot == null || slot.occupied)
         {
             RevertUnit(unit);
             return;
         }
 
-        BoardSlot targetSlot = board.GetSlotByIndex(slotIndex);
-        if (targetSlot == null || targetSlot.occupied)
-        {
-            RevertUnit(unit);
-            return;
-        }
-
-        unit.SnapToSlot(targetSlot);
+        unit.SnapToSlot(slot);
     }
+
 
     void RevertUnit(UnitController unit)
     {
-        if (unit.CurrentSlot == null)
-            return;
+        if (unit.CurrentSlot == null) return;
 
-        Vector3 correctedPos = unit.CurrentSlot.SnapPosition;
-        correctedPos.y += unit.GetPlacementYOffset();
+        BoardSlot slot = unit.CurrentSlot;
 
-        unit.transform.position = correctedPos;
+        Collider unitCol = unit.GetComponent<Collider>();
+        Collider slotCol = slot.GetComponent<Collider>();
 
-        RevertUnitClientRpc(
-            unit.NetworkObjectId,
-            correctedPos,
-            new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new[] { unit.OwnerClientId }
-                }
-            });
+        float yOffset = unitCol.bounds.extents.y + slotCol.bounds.extents.y;
+
+        Vector3 pos = slot.SnapPosition;
+        pos.y += yOffset;
+
+        unit.transform.position = pos;
     }
+
 
 
     [ClientRpc]
@@ -139,6 +130,19 @@ public class BoardManager : NetworkBehaviour
             return;
 
         netObj.transform.position = revertPosition;
+    }
+
+    [ClientRpc]
+    void PlaceUnitClientRpc(
+        ulong unitNetworkId,
+        Vector3 finalPosition,
+        ClientRpcParams rpcParams = default)
+    {
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(unitNetworkId, out var netObj))
+            return;
+
+        netObj.transform.position = finalPosition;
     }
 
 }

@@ -113,27 +113,39 @@ public class UnitController : NetworkBehaviour
         GetComponent<NetworkObject>().Despawn(true);
     }
 
-    public float GetPlacementYOffset()
+    public float GetPlacementYOffset(BoardSlot slot)
     {
-        Collider col = GetComponent<Collider>();
-        if (col == null)
+        Collider unitCol = GetComponent<Collider>();
+        Collider slotCol = slot.GetComponent<Collider>();
+
+        if (unitCol == null || slotCol == null)
             return 0f;
 
-        return col.bounds.extents.y;
+        float unitHalfHeight = unitCol.bounds.extents.y;
+        float slotHalfHeight = slotCol.bounds.extents.y;
+
+        return unitHalfHeight + slotHalfHeight;
     }
 
     public void SnapToSlot(BoardSlot slot)
     {
+        if (!IsServer) return;
+
         if (CurrentSlot != null)
-        {
             CurrentSlot.Clear();
-        }
 
         CurrentSlot = slot;
         slot.Assign(this);
 
+        Collider unitCol = GetComponent<Collider>();
+        Collider slotCol = slot.GetComponent<Collider>();
+
+        float yOffset = unitCol.bounds.extents.y + slotCol.bounds.extents.y;
+
         Vector3 pos = slot.SnapPosition;
-        pos.y += GetPlacementYOffset();
+        pos.y += yOffset;
+
         transform.position = pos;
     }
+
 }

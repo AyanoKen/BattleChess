@@ -4,10 +4,11 @@ using Unity.Netcode.Components;
 
 public class UnitDragHandler : NetworkBehaviour
 {
-    
+    [SerializeField] private float hoverHeight = 2.2f;
+
     private Camera cam;
     private bool dragging;
-    private Vector3 dragOffset;
+    private Collider unitCollider;
     private NetworkTransform netTransform;
 
     void Start()
@@ -15,6 +16,7 @@ public class UnitDragHandler : NetworkBehaviour
         if (!IsOwner) return;
 
         cam = Camera.main;
+        unitCollider = GetComponent<Collider>();
         netTransform = GetComponent<NetworkTransform>();
     }
 
@@ -24,17 +26,24 @@ public class UnitDragHandler : NetworkBehaviour
 
         dragging = true;
 
+        if (unitCollider != null)
+            unitCollider.enabled = false;
+
         if (netTransform != null)
-        {
             netTransform.enabled = false;
-        }
+    }
 
-        Plane plane = new Plane(Vector3.up, transform.position);
+    void Update()
+    {
+        if (!dragging || !IsOwner) return;
+
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Plane boardPlane = new Plane(Vector3.up, Vector3.zero);
 
-        if (plane.Raycast(ray, out float enter))
+        if (boardPlane.Raycast(ray, out float enter))
         {
-            dragOffset = transform.position - ray.GetPoint(enter);
+            Vector3 p = ray.GetPoint(enter);
+            transform.position = new Vector3(p.x, hoverHeight, p.z);
         }
     }
 
@@ -44,40 +53,29 @@ public class UnitDragHandler : NetworkBehaviour
 
         dragging = false;
 
+        if (unitCollider != null)
+            unitCollider.enabled = true;
+
+        if (netTransform != null)
+            netTransform.enabled = true;
+
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        int slotIndex = -1;
+
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             BoardSlot slot = hit.collider.GetComponent<BoardSlot>();
-            if (slot == null)
-            {
-                SubmitDropServerRpc(-1);
-                return;
-            }
-
-            SubmitDropServerRpc(slot.slotIndex);
+            if (slot != null)
+                slotIndex = slot.slotIndex;
         }
-        
-    }
 
-    void Update()
-    {
-        if (!dragging || !IsOwner) return;
-
-        Plane plane = new Plane(Vector3.up, Vector3.zero);
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-
-        if (plane.Raycast(ray, out float enter))
-        {
-            transform.position = ray.GetPoint(enter) + dragOffset;
-        }
+        SubmitDropServerRpc(slotIndex);
     }
 
     [ServerRpc]
     void SubmitDropServerRpc(int slotIndex)
     {
-        UnitController unit = GetComponent<UnitController>();
-        BoardManager boardManager = FindObjectOfType<BoardManager>();
-
-        boardManager.TryPlaceUnit(unit, slotIndex);
+        BoardManager bm = FindObjectOfType<BoardManager>();
+        bm.TryPlaceUnit(GetComponent<UnitController>(), slotIndex);
     }
 }

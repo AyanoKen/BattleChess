@@ -44,7 +44,7 @@ public class SpawnManager : NetworkBehaviour
         agent.enabled = false;
 
         Vector3 correctedPos = slot.SnapPosition;
-        correctedPos.y += unit.GetPlacementYOffset();
+        correctedPos.y += unit.GetPlacementYOffset(slot);
         pawn.transform.position = correctedPos;
 
         pawn.GetComponent<NetworkObject>()
