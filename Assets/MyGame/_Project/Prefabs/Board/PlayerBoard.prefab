@@ -99,6 +99,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &4495210865292551119
 BoxCollider:
@@ -220,6 +221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &559932193712681826
 BoxCollider:
@@ -520,7 +522,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 97f68e3e3c15b13439b320d75b22414a, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 1c338c605a7793e43a28644afd6ed8cc, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &4455825195600956450
 GameObject:
@@ -621,6 +623,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &968123540061409878
 BoxCollider:
@@ -742,6 +745,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &7501209854012311209
 BoxCollider:
@@ -863,6 +867,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &6328602743153480900
 BoxCollider:
@@ -984,6 +989,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &4718580359525232734
 BoxCollider:
@@ -1211,6 +1217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &9014653152703041315
 BoxCollider:
@@ -1281,7 +1288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 290761194
+  GlobalObjectIdHash: 1408833429
   InScenePlacedSourceGlobalObjectIdHash: 1716584170
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1303,8 +1310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   benchSlots: []
-  boardBounds: {fileID: 0}
-  benchBounds: {fileID: 0}
+  boardSlots: []
 --- !u!1 &7290671251454910875
 GameObject:
   m_ObjectHideFlags: 0
@@ -1404,6 +1410,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 0
 --- !u!65 &3764104561748583568
 BoxCollider:
@@ -1550,6 +1557,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &550819320967312846
 PrefabInstance:
@@ -1675,6 +1683,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &1101478927789784634
 PrefabInstance:
@@ -1795,6 +1804,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &631493795065731537 stripped
 Transform:
@@ -1925,6 +1935,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &1716345410291047445
 PrefabInstance:
@@ -2050,6 +2061,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &1819383320447066496
 PrefabInstance:
@@ -2170,6 +2182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &2212681393072883307 stripped
 Transform:
@@ -2295,6 +2308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &2043669865327564035 stripped
 Transform:
@@ -2420,6 +2434,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &1959445945974295642 stripped
 Transform:
@@ -2550,6 +2565,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &2996607739247526412
 PrefabInstance:
@@ -2670,6 +2686,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &3322723734534776295 stripped
 Transform:
@@ -2800,6 +2817,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &3533880361880752253
 PrefabInstance:
@@ -2925,6 +2943,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &4033628650286196431
 PrefabInstance:
@@ -3050,6 +3069,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &4821356928761333898
 PrefabInstance:
@@ -3175,6 +3195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &5313759088868489453
 PrefabInstance:
@@ -3295,6 +3316,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &5635404743212736262 stripped
 Transform:
@@ -3420,6 +3442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &5655792561150252357 stripped
 Transform:
@@ -3545,6 +3568,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &5565473764396947441 stripped
 Transform:
@@ -3675,6 +3699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &6320991481086507941
 PrefabInstance:
@@ -3800,6 +3825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &6344070648135478044
 PrefabInstance:
@@ -3920,6 +3946,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &6881522053798006007 stripped
 Transform:
@@ -4045,6 +4072,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &6897482195783408296 stripped
 Transform:
@@ -4170,6 +4198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &6574903290287969172 stripped
 Transform:
@@ -4295,6 +4324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &6430985893090980645 stripped
 Transform:
@@ -4425,6 +4455,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &7447817399307195983
 PrefabInstance:
@@ -4550,6 +4581,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &7806725636589306298
 PrefabInstance:
@@ -4670,6 +4702,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!4 &7772569638208677457 stripped
 Transform:
@@ -4800,6 +4833,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1
 --- !u!1001 &8522327005936784112
 PrefabInstance:
@@ -4925,4 +4959,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupied: 0
   currentUnit: {fileID: 0}
+  slotIndex: 0
   slotType: 1

@@ -20,20 +20,30 @@ public class UnitController : NetworkBehaviour
     private NavMeshAgent agent;
     private UnitController currentTarget;
 
+    private float visualYOffset;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         currentHP = maxHP;
+
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+        {
+            visualYOffset = col.bounds.extents.y;
+        }
     }
 
     void Update()
     {
-        if(!IsServer) return;
+        if (!IsServer) return;
 
-        if (GamePhaseManager.Instance.CurrentPhase.Value != GamePhaseManager.GamePhase.Battle)
-        {
+        if (GamePhaseManager.Instance.CurrentPhase.Value
+            != GamePhaseManager.GamePhase.Battle)
             return;
-        } 
+
+        if (!agent.enabled || !agent.isOnNavMesh)
+            return;
 
         if (currentTarget == null || currentTarget.IsDead())
         {
@@ -67,9 +77,7 @@ public class UnitController : NetworkBehaviour
         foreach (var unit in allUnits)
         {
             if (unit == this || unit.IsDead() || unit.teamId == teamId)
-            {
                 continue;
-            }
 
             float dist = Vector3.Distance(
                 transform.position,
@@ -116,6 +124,8 @@ public class UnitController : NetworkBehaviour
         GetComponent<NetworkObject>().Despawn(true);
     }
 
+    // ---------- Placement ----------
+
     public float GetPlacementYOffset(BoardSlot slot)
     {
         Collider unitCol = GetComponent<Collider>();
@@ -124,10 +134,7 @@ public class UnitController : NetworkBehaviour
         if (unitCol == null || slotCol == null)
             return 0f;
 
-        float unitHalfHeight = unitCol.bounds.extents.y;
-        float slotHalfHeight = slotCol.bounds.extents.y;
-
-        return unitHalfHeight + slotHalfHeight;
+        return unitCol.bounds.extents.y + slotCol.bounds.extents.y;
     }
 
     public void SnapToSlot(BoardSlot slot)
@@ -151,14 +158,41 @@ public class UnitController : NetworkBehaviour
         transform.position = pos;
     }
 
-    void OnEnable()
+    // ---------- NavMesh ----------
+
+    void SnapToNavMesh()
+    {
+        if (NavMesh.SamplePosition(
+            transform.position,
+            out NavMeshHit hit,
+            2.5f,
+            NavMesh.AllAreas))
+        {
+            Vector3 snapped = hit.position;
+            snapped.y += visualYOffset;
+            transform.position = snapped;
+        }
+        else
+        {
+            Debug.LogWarning($"{name} failed to snap to NavMesh");
+        }
+    }
+
+    // ---------- Phase Handling ----------
+
+    public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
 
         GamePhaseManager.Instance.CurrentPhase.OnValueChanged += OnPhaseChanged;
+
+        OnPhaseChanged(
+            GamePhaseManager.GamePhase.Prep,
+            GamePhaseManager.Instance.CurrentPhase.Value
+        );
     }
 
-    void OnDisable()
+    public override void OnNetworkDespawn()
     {
         if (GamePhaseManager.Instance == null) return;
 
@@ -172,10 +206,20 @@ public class UnitController : NetworkBehaviour
         if (!IsServer) return;
 
         if (newPhase == GamePhaseManager.GamePhase.Battle)
+        {
             agent.enabled = true;
+
+            SnapToNavMesh();
+
+            if (!agent.isOnNavMesh)
+            {
+                Debug.LogError($"{name} is not on NavMesh after snap");
+                agent.enabled = false;
+            }
+        }
         else
+        {
             agent.enabled = false;
+        }
     }
-
-
 }
