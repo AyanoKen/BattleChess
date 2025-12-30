@@ -17,6 +17,7 @@ public class GamePhaseManager : NetworkBehaviour
     [SerializeField] private GameObject[] battleUnitPrefabs;
 
     [SerializeField] private float prepDuration = 20f;
+    [SerializeField] private float battleDuration = 10f;
 
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
@@ -84,7 +85,7 @@ public class GamePhaseManager : NetworkBehaviour
     void StartBattlePhase()
     {
         CurrentPhase.Value = GamePhase.Battle;
-        PhaseTimer.Value = 0f;
+        PhaseTimer.Value = battleDuration;
         Debug.Log("Battle Phase");
 
         SpawnEnemyUnitsOnBoards();
@@ -95,7 +96,42 @@ public class GamePhaseManager : NetworkBehaviour
         CurrentPhase.Value = GamePhase.Resolution;
         PhaseTimer.Value = 0f;
         Debug.Log("Resolving Battle");
+
+        ResolveBattle();
     }
+
+    void ResolveBattle()
+    {
+        foreach (var unit in FindObjectsOfType<UnitController>())
+        {
+            if (unit.SourceUnitNetworkId != 0)
+            {
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
+                    .TryGetValue(unit.SourceUnitNetworkId, out var realObj))
+                {
+                    var realUnit = realObj.GetComponent<UnitController>();
+                    realUnit.SetHP(unit.GetHP());
+                }
+
+                unit.GetComponent<NetworkObject>().Despawn(true);
+            }
+        }
+
+        RestoreHostUnits();
+        StartPrepPhase();
+    }
+
+    void RestoreHostUnits()
+    {
+        foreach (var unit in FindObjectsOfType<UnitController>())
+        {
+            if (unit.CurrentSlot == null)
+                continue;
+
+            unit.ReturnToSlot();
+        }
+    }
+
 
     void SpawnEnemyUnitsOnBoards()
     {
@@ -159,6 +195,8 @@ public class GamePhaseManager : NetworkBehaviour
 
         controller.teamId =
             enemyOwnerId == NetworkManager.ServerClientId ? 0 : 1;
+
+        controller.SourceUnitNetworkId = state.sourceUnitId;
 
         unit.GetComponent<NetworkObject>().Spawn();
     }

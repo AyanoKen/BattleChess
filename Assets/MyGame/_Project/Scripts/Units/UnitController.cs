@@ -24,6 +24,11 @@ public class UnitController : NetworkBehaviour
 
     private float visualYOffset;
 
+    [HideInInspector]
+    public ulong SourceUnitNetworkId;
+
+    public float GetHP() => currentHP;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -69,6 +74,12 @@ public class UnitController : NetworkBehaviour
             TryAttack();
         }
     }
+
+    public void SetHP(float hp)
+    {
+        currentHP = Mathf.Clamp(hp, 0f, maxHP);
+    }
+
 
     void FindTarget()
     {
@@ -167,6 +178,23 @@ public class UnitController : NetworkBehaviour
 
         transform.position = pos;
     }
+
+    public void ReturnToSlot()
+    {
+        if (!IsServer || CurrentSlot == null)
+            return;
+
+        Collider unitCol = GetComponent<Collider>();
+        Collider slotCol = CurrentSlot.GetComponent<Collider>();
+
+        float yOffset = unitCol.bounds.extents.y + slotCol.bounds.extents.y;
+
+        Vector3 pos = CurrentSlot.SnapPosition;
+        pos.y += yOffset;
+
+        transform.position = pos;
+    }
+
 
     // ---------- NavMesh ----------
 

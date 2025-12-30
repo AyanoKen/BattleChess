@@ -72,7 +72,8 @@ public class PlayerBoard : NetworkBehaviour
             state.Add(new UnitBoardState
             {
                 slotIndex = slot.slotIndex,
-                unitTypeId = slot.currentUnit.unitTypeId
+                unitTypeId = slot.currentUnit.unitTypeId,
+                sourceUnitId = slot.currentUnit.NetworkObjectId
             });
         }
 

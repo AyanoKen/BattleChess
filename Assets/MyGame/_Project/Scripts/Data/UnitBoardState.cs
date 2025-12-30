@@ -5,4 +5,5 @@ public struct UnitBoardState
 {
     public int slotIndex;
     public int unitTypeId;
+    public ulong sourceUnitId;
 }
