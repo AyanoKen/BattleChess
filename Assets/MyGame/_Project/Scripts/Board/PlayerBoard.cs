@@ -1,35 +1,30 @@
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 public class PlayerBoard : NetworkBehaviour
 {
     [Header("Bench")]
     public BoardSlot[] benchSlots;
-    
     public BoardSlot[] boardSlots; 
+    public BoardSlot[] enemySlots;
 
     void Awake()
     {
-        benchSlots = GetComponentsInChildren<BoardSlot>()
-            .Where(slot => slot.slotType == BoardSlot.SlotType.Bench)
+        var allSlots = GetComponentsInChildren<BoardSlot>();
+
+        benchSlots = allSlots
+            .Where(s => s.slotType == BoardSlot.SlotType.Bench)
             .ToArray();
 
-        for (int i = 0; i < benchSlots.Length; i++)
-        {
-            benchSlots[i].slotIndex = i;
-        }
-
-        boardSlots = GetComponentsInChildren<BoardSlot>()
-            .Where(slot => slot.slotType == BoardSlot.SlotType.Board)
+        boardSlots = allSlots
+            .Where(s => s.slotType == BoardSlot.SlotType.Board)
             .ToArray();
 
-        int boardOffset = benchSlots.Length;
-
-        for (int i = 0; i < boardSlots.Length; i++)
-        {
-            boardSlots[i].slotIndex = boardOffset + i;
-        }
+        enemySlots = allSlots
+            .Where(s => s.slotType == BoardSlot.SlotType.Enemy)
+            .ToArray();
     }
 
     public BoardSlot GetFreeBenchSlot()
@@ -53,4 +48,35 @@ public class PlayerBoard : NetworkBehaviour
 
         return null;
     }
+
+    public BoardSlot GetEnemySlotByIndex(int slotIndex)
+    {
+        foreach (var slot in enemySlots)
+        {
+            if (slot.slotIndex == slotIndex)
+                return slot;
+        }
+
+        return null;
+    }
+
+    public List<UnitBoardState> CaptureBoardState()
+    {
+        List<UnitBoardState> state = new List<UnitBoardState>();
+
+        foreach (var slot in boardSlots)
+        {
+            if (!slot.occupied || slot.currentUnit == null)
+                continue;
+
+            state.Add(new UnitBoardState
+            {
+                slotIndex = slot.slotIndex,
+                unitTypeId = slot.currentUnit.unitTypeId
+            });
+        }
+
+        return state;
+    }
+
 }

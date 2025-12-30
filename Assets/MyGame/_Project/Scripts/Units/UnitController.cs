@@ -10,6 +10,7 @@ public class UnitController : NetworkBehaviour
     public float attackRange = 1.8f;
     public float attackCooldown = 1.2f;
     public int teamId = 0;
+    public int unitTypeId;
 
     [HideInInspector]
     public BoardSlot CurrentSlot;

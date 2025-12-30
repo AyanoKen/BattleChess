@@ -1,5 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
+
 
 public class GamePhaseManager : NetworkBehaviour
 {
@@ -11,6 +13,8 @@ public class GamePhaseManager : NetworkBehaviour
         Battle,
         Resolution
     }
+
+    [SerializeField] private GameObject[] battleUnitPrefabs;
 
     [SerializeField] private float prepDuration = 20f;
 
@@ -82,6 +86,8 @@ public class GamePhaseManager : NetworkBehaviour
         CurrentPhase.Value = GamePhase.Battle;
         PhaseTimer.Value = 0f;
         Debug.Log("Battle Phase");
+
+        SpawnEnemyUnitsOnBoards();
     }
 
     void StartResolutionPhase()
@@ -90,4 +96,83 @@ public class GamePhaseManager : NetworkBehaviour
         PhaseTimer.Value = 0f;
         Debug.Log("Resolving Battle");
     }
+
+    void SpawnEnemyUnitsOnBoards()
+    {
+        BoardManager bm = FindObjectOfType<BoardManager>();
+
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            PlayerBoard playerBoard = bm.GetBoardForClient(clientId);
+            if (playerBoard == null)
+                continue;
+
+            ulong enemyClientId =
+                NetworkManager.Singleton.ConnectedClientsIds
+                    .First(id => id != clientId);
+
+            PlayerBoard enemyBoard =
+                bm.GetBoardForClient(enemyClientId);
+
+            if (enemyBoard == null)
+                continue;
+
+            var enemyState = enemyBoard.CaptureBoardState();
+
+            foreach (var unitState in enemyState)
+            {
+                SpawnEnemyUnit(
+                    unitState,
+                    playerBoard,
+                    enemyClientId
+                );
+            }
+        }
+    }
+
+    void SpawnEnemyUnit(
+        UnitBoardState state,
+        PlayerBoard targetBoard,
+        ulong enemyOwnerId)
+    {
+        BoardSlot spawnSlot =
+            targetBoard.GetEnemySlotByIndex(state.slotIndex);
+
+        if (spawnSlot == null)
+        {
+            Debug.LogWarning(
+                $"No enemy slot for index {state.slotIndex}"
+            );
+            return;
+        }
+
+        GameObject prefab = GetBattlePrefab(state.unitTypeId);
+
+        GameObject unit = Instantiate(
+            prefab,
+            spawnSlot.SnapPosition,
+            Quaternion.identity
+        );
+
+        UnitController controller =
+            unit.GetComponent<UnitController>();
+
+        controller.teamId =
+            enemyOwnerId == NetworkManager.ServerClientId ? 0 : 1;
+
+        unit.GetComponent<NetworkObject>().Spawn();
+    }
+
+    GameObject GetBattlePrefab(int unitTypeId)
+    {
+        if (unitTypeId < 0 || unitTypeId >= battleUnitPrefabs.Length)
+        {
+            Debug.LogError($"Invalid unitTypeId: {unitTypeId}");
+            return null;
+        }
+
+        return battleUnitPrefabs[unitTypeId];
+    }
+
+
 }

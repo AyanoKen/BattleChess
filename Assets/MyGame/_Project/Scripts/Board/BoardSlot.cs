@@ -10,7 +10,8 @@ public class BoardSlot : MonoBehaviour
     public enum SlotType
     {
         Bench, 
-        Board
+        Board,
+        Enemy
     }
 
     public SlotType slotType;

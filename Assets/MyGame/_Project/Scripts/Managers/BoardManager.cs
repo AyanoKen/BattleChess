@@ -145,4 +145,10 @@ public class BoardManager : NetworkBehaviour
         netObj.transform.position = finalPosition;
     }
 
+    public PlayerBoard GetHostBoard()
+    {
+        return GetBoardForClient(NetworkManager.ServerClientId);
+    }
+
+
 }

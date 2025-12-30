@@ -835,6 +835,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0d29dc65fde9fd4e86f54f6d78b682b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  battleUnitPrefabs:
+  - {fileID: 9182004988832708464, guid: 93f4f54b5e1ac194b92b2a0519e80acd, type: 3}
   prepDuration: 20
   CurrentPhase:
     m_InternalValue: 0
