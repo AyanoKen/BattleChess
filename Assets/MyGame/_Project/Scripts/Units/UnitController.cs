@@ -11,6 +11,7 @@ public class UnitController : NetworkBehaviour
     public float attackCooldown = 1.2f;
     public int teamId = 0;
     public int unitTypeId;
+    public float detectionRadius = 50f;
 
     [HideInInspector]
     public BoardSlot CurrentSlot;
@@ -71,12 +72,20 @@ public class UnitController : NetworkBehaviour
 
     void FindTarget()
     {
-        UnitController[] allUnits = FindObjectsOfType<UnitController>();
+        Collider[] hits = Physics.OverlapSphere(
+            transform.position,
+            detectionRadius
+        );
+
         float closest = float.MaxValue;
         UnitController best = null;
 
-        foreach (var unit in allUnits)
+        foreach (var hit in hits)
         {
+            UnitController unit = hit.GetComponent<UnitController>();
+            if (unit == null)
+                continue;
+
             if (unit == this || unit.IsDead() || unit.teamId == teamId)
                 continue;
 
