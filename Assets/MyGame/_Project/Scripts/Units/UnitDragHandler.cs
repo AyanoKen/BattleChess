@@ -24,18 +24,32 @@ public class UnitDragHandler : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        if (GamePhaseManager.Instance.CurrentPhase.Value != GamePhaseManager.GamePhase.Prep)
+        {
+            return;
+        } 
+
         dragging = true;
 
         if (unitCollider != null)
+        {
             unitCollider.enabled = false;
+        }
 
         if (netTransform != null)
+        {
             netTransform.enabled = false;
+        }
     }
 
     void Update()
     {
         if (!dragging || !IsOwner) return;
+
+        if (GamePhaseManager.Instance.CurrentPhase.Value != GamePhaseManager.GamePhase.Prep)
+        {
+            return;
+        } 
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         Plane boardPlane = new Plane(Vector3.up, Vector3.zero);

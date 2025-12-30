@@ -184,7 +184,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9182004988832708464}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78e54a41483ac134b90fba91609d192d, type: 3}
   m_Name: 
@@ -194,6 +194,7 @@ MonoBehaviour:
   attackRange: 1.8
   attackCooldown: 1.2
   teamId: 0
+  CurrentSlot: {fileID: 0}
 --- !u!114 &-8210351636321751378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,3 +238,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4196f8f1f8432c45b87075aa77cfbae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hoverHeight: 2.2

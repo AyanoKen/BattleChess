@@ -30,7 +30,10 @@ public class UnitController : NetworkBehaviour
     {
         if(!IsServer) return;
 
-        if(true) return; //Fix later when adding battole and prep phase
+        if (GamePhaseManager.Instance.CurrentPhase.Value != GamePhaseManager.GamePhase.Battle)
+        {
+            return;
+        } 
 
         if (currentTarget == null || currentTarget.IsDead())
         {
@@ -147,5 +150,32 @@ public class UnitController : NetworkBehaviour
 
         transform.position = pos;
     }
+
+    void OnEnable()
+    {
+        if (!IsServer) return;
+
+        GamePhaseManager.Instance.CurrentPhase.OnValueChanged += OnPhaseChanged;
+    }
+
+    void OnDisable()
+    {
+        if (GamePhaseManager.Instance == null) return;
+
+        GamePhaseManager.Instance.CurrentPhase.OnValueChanged -= OnPhaseChanged;
+    }
+
+    void OnPhaseChanged(
+        GamePhaseManager.GamePhase oldPhase,
+        GamePhaseManager.GamePhase newPhase)
+    {
+        if (!IsServer) return;
+
+        if (newPhase == GamePhaseManager.GamePhase.Battle)
+            agent.enabled = true;
+        else
+            agent.enabled = false;
+    }
+
 
 }

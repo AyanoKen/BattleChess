@@ -8,6 +8,11 @@ public class SpawnManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void RequestSpawnPawnServerRpc(ServerRpcParams rpcParams = default)
     {
+        if (GamePhaseManager.Instance.CurrentPhase.Value != GamePhaseManager.GamePhase.Prep)
+        {
+            return;
+        } 
+
         ulong clientId = rpcParams.Receive.SenderClientId;
 
         BoardManager boardManager = FindObjectOfType<BoardManager>();
