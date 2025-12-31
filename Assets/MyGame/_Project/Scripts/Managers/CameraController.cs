@@ -38,26 +38,43 @@ public class CameraController : MonoBehaviour
     GamePhaseManager.GamePhase oldPhase,
     GamePhaseManager.GamePhase newPhase)
     {
-        if (newPhase != GamePhaseManager.GamePhase.Battle)
-            return;
-
-        MoveCameraToHostBoard();
+        if (newPhase == GamePhaseManager.GamePhase.Battle)
+        {
+            MoveCameraToBattleView();
+        }
+        else if (newPhase == GamePhaseManager.GamePhase.Prep)
+        {
+            PositionCamera();
+        }
     }
 
-    void MoveCameraToHostBoard()
+    void MoveCameraToBattleView()
     {
+        ulong localId = NetworkManager.Singleton.LocalClientId;
+
         foreach (var board in FindObjectsOfType<PlayerBoard>())
         {
             if (board.OwnerClientId == NetworkManager.ServerClientId)
             {
+                Vector3 baseOffset = new Vector3(10, 10, 0);
+
                 Camera.main.transform.position =
-                    board.transform.position + new Vector3(10, 10, 0);
+                    board.transform.position + baseOffset;
 
                 Camera.main.transform.LookAt(board.transform.position);
+
+                if (localId != NetworkManager.ServerClientId)
+                {
+                    Camera.main.transform.RotateAround(
+                        board.transform.position,
+                        Vector3.up,
+                        180f
+                    );
+                }
+
                 return;
             }
         }
     }
-
 
 }
