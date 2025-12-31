@@ -201,7 +201,7 @@ public class GamePhaseManager : NetworkBehaviour
         unit.GetComponent<NetworkObject>().Spawn();
     }
 
-    GameObject GetBattlePrefab(int unitTypeId)
+    public GameObject GetBattlePrefab(int unitTypeId)
     {
         if (unitTypeId < 0 || unitTypeId >= battleUnitPrefabs.Length)
         {

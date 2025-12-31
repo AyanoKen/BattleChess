@@ -27,13 +27,62 @@ public static class FusionManager
         UnitController survivor = target;
         UnitController consumed = source;
 
+        survivor.AddHP(consumed.GetHP());
         survivor.fusionCount++;
 
-        survivor.unitType = UnitController.UnitType.Rook;
-
-        // Swap prefab later – for now just log
-        Debug.Log("Pawn fused into Rook!");
-
         consumed.GetComponent<NetworkObject>().Despawn(true);
+
+        if (survivor.fusionCount >= 2)
+        {
+            PromotePawn(survivor);
+        }
+
     }
+
+    static void PromotePawn(UnitController pawn)
+    {
+        BoardSlot slot = pawn.CurrentSlot;
+        ulong ownerId = pawn.OwnerClientId;
+
+        if (slot == null)
+            return;
+
+        float carriedHp = pawn.GetHP();
+
+        UnitController.UnitType newType = UnitController.UnitType.Rook;
+        int newTypeId = (int)newType;
+
+        GameObject prefab =
+            GamePhaseManager.Instance.GetBattlePrefab(newTypeId);
+
+        if (prefab == null)
+        {
+            Debug.Log("Fusion Failed here");
+            return;
+        }
+
+        Vector3 spawnPos = pawn.transform.position;
+        Quaternion spawnRot = pawn.transform.rotation;
+
+        pawn.GetComponent<Unity.Netcode.NetworkObject>().Despawn(true);
+
+        GameObject upgraded = Object.Instantiate(
+            prefab,
+            spawnPos,
+            spawnRot
+        );
+
+        var controller = upgraded.GetComponent<UnitController>();
+        controller.unitType = newType;
+        controller.fusionCount = 0;
+        controller.SetHP(carriedHp + controller.maxHP);
+
+        upgraded.GetComponent<Unity.Netcode.NetworkObject>()
+            .SpawnWithOwnership(ownerId);
+
+        controller.SnapToSlot(slot);
+
+        Debug.Log("Pawn promoted to Rook");
+    }
+
 }

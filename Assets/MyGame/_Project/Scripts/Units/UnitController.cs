@@ -7,8 +7,8 @@ public class UnitController : NetworkBehaviour
     public enum UnitType
     {
         Pawn,
-        Knight,
-        Bishop,
+        Bishop, 
+        Knight, 
         Rook,
         Queen,
         King
@@ -92,6 +92,11 @@ public class UnitController : NetworkBehaviour
     public void SetHP(float hp)
     {
         currentHP = Mathf.Clamp(hp, 0f, maxHP);
+    }
+
+    public void AddHP(float hp)
+    {
+        SetHP(currentHP + hp);
     }
 
 
@@ -246,10 +251,19 @@ public class UnitController : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        if (GamePhaseManager.Instance == null) return;
+        // Clean up board slot
+        if (IsServer && CurrentSlot != null)
+        {
+            CurrentSlot.Clear();
+            CurrentSlot = null;
+        }
 
-        GamePhaseManager.Instance.CurrentPhase.OnValueChanged -= OnPhaseChanged;
+        if (GamePhaseManager.Instance != null)
+        {
+            GamePhaseManager.Instance.CurrentPhase.OnValueChanged -= OnPhaseChanged;
+        }
     }
+
 
     void OnPhaseChanged(
         GamePhaseManager.GamePhase oldPhase,
