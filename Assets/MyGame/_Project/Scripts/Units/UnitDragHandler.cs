@@ -129,7 +129,7 @@ public class UnitDragHandler : NetworkBehaviour
 
         if (!success)
         {
-            RevertUnitToSlot(source);
+            source.ReturnToSlot();
         }
     }
 

@@ -15,7 +15,7 @@ public static class FusionManager
             return false;
 
         // Only pawn fusion for now, change this later
-        if (source.unitType != UnitController.UnitType.Pawn)
+        if (source.unitType != UnitController.UnitType.Pawn) 
             return false;
 
         FusePawn(source, target);
