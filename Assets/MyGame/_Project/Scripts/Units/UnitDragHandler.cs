@@ -68,22 +68,40 @@ public class UnitDragHandler : NetworkBehaviour
         dragging = false;
 
         if (unitCollider != null)
+        {
             unitCollider.enabled = true;
+        }
 
         if (netTransform != null)
+        {
             netTransform.enabled = true;
+        }
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         int slotIndex = -1;
 
+        UnitController targetUnit = null;
+
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            BoardSlot slot = hit.collider.GetComponent<BoardSlot>();
-            if (slot != null)
-                slotIndex = slot.slotIndex;
-        }
+            targetUnit = hit.collider.GetComponent<UnitController>();
 
-        SubmitDropServerRpc(slotIndex);
+            if (targetUnit == null)
+            {
+                BoardSlot slot = hit.collider.GetComponent<BoardSlot>();
+                if (slot != null)
+                {
+                    slotIndex = slot.slotIndex;
+                }
+
+                SubmitDropServerRpc(slotIndex);
+            }
+            else //Dropped on another unit, so checking for fusion
+            {
+                SubmitFusionServerRpc(targetUnit.NetworkObjectId);
+            }
+            
+        }
     }
 
     [ServerRpc]
@@ -92,4 +110,27 @@ public class UnitDragHandler : NetworkBehaviour
         BoardManager bm = FindObjectOfType<BoardManager>();
         bm.TryPlaceUnit(GetComponent<UnitController>(), slotIndex);
     }
+
+    [ServerRpc]
+    void SubmitFusionServerRpc(ulong targetUnitId)
+    {
+        if (GamePhaseManager.Instance.CurrentPhase.Value
+            != GamePhaseManager.GamePhase.Prep)
+            return;
+
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(targetUnitId, out var targetObj))
+            return;
+
+        var source = GetComponent<UnitController>();
+        var target = targetObj.GetComponent<UnitController>();
+
+        bool success = FusionManager.TryFuse(source, target);
+
+        if (!success)
+        {
+            RevertUnitToSlot(source);
+        }
+    }
+
 }

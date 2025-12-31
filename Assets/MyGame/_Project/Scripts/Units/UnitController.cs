@@ -4,6 +4,16 @@ using Unity.Netcode;
 
 public class UnitController : NetworkBehaviour
 {
+    public enum UnitType
+    {
+        Pawn,
+        Knight,
+        Bishop,
+        Rook,
+        Queen,
+        King
+    }
+
     [Header("Stats")]
     public float maxHP = 100f;
     public float attackDamage = 10f;
@@ -13,8 +23,12 @@ public class UnitController : NetworkBehaviour
     public int unitTypeId;
     public float detectionRadius = 50f;
 
+    public UnitType unitType;
+
     [HideInInspector]
     public BoardSlot CurrentSlot;
+
+    public int fusionCount = 0;
 
     private float currentHP;
     private float attackTimer;
