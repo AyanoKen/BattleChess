@@ -48,6 +48,7 @@ public static class FusionManager
             return;
 
         float carriedHp = pawn.GetHP();
+        int teamId = pawn.teamId;
 
         UnitController.UnitType newType = UnitController.UnitType.Rook;
         int newTypeId = (int)newType;
@@ -76,6 +77,7 @@ public static class FusionManager
         controller.unitType = newType;
         controller.fusionCount = 0;
         controller.SetHP(carriedHp + controller.maxHP);
+        controller.teamId = teamId;
 
         upgraded.GetComponent<Unity.Netcode.NetworkObject>()
             .SpawnWithOwnership(ownerId);

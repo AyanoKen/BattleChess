@@ -30,7 +30,7 @@ public class UnitController : NetworkBehaviour
 
     public int fusionCount = 0;
 
-    private float currentHP;
+    public float currentHP;
     private float attackTimer;
 
     private NavMeshAgent agent;
@@ -91,7 +91,10 @@ public class UnitController : NetworkBehaviour
 
     public void SetHP(float hp)
     {
-        currentHP = Mathf.Clamp(hp, 0f, maxHP);
+        if (hp >= 0)
+        {
+            currentHP = hp;
+        }
     }
 
     public void AddHP(float hp)
@@ -251,7 +254,6 @@ public class UnitController : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        // Clean up board slot
         if (IsServer && CurrentSlot != null)
         {
             CurrentSlot.Clear();
