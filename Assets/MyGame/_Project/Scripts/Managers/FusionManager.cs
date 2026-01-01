@@ -17,6 +17,9 @@ public static class FusionManager
         if (source.unitType == UnitController.UnitType.Queen)
             return false;
 
+        if (source.unitType == UnitController.UnitType.King)
+            return false;
+
 
         FuseUnit(source, target);
         return true;

@@ -92,6 +92,20 @@ public class UnitDragHandler : NetworkBehaviour
                 if (slot != null)
                 {
                     slotIndex = slot.slotIndex;
+
+                    if(slot.slotType == BoardSlot.SlotType.Enemy)
+                    {
+                        slotIndex = -1;   
+                    }
+
+                    if (slot.slotType == BoardSlot.SlotType.Bench)
+                    {
+                        if (GetComponent<UnitController>().unitType == UnitController.UnitType.King)
+                        {
+                            slotIndex = -1;
+                        }
+                    }
+                    
                 }
 
                 SubmitDropServerRpc(slotIndex);

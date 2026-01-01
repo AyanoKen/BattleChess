@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
+using System.Collections.Generic;
 
 public class UnitController : NetworkBehaviour
 {
@@ -28,6 +29,9 @@ public class UnitController : NetworkBehaviour
     [Header("Bishop Specific")]
     public float aoeRadius = 2f;
     public float aoeDamage = 20f;
+
+    [Header("Queen Specific")]
+    public int maxTargets = 3;
 
     [HideInInspector]
     public BoardSlot CurrentSlot;
@@ -158,11 +162,19 @@ public class UnitController : NetworkBehaviour
         if (attackTimer > 0f) return;
 
         attackTimer = attackCooldown;
-        currentTarget.TakeDamage(attackDamage);
 
-        if (unitType == UnitType.Bishop)
+        if(unitType == UnitType.Queen)
         {
-            ApplyAOEDamage(currentTarget.transform.position);
+            ApplyMultiTargetAttack();
+        }
+        else
+        {
+            currentTarget.TakeDamage(attackDamage);
+
+            if (unitType == UnitType.Bishop)
+            {
+                ApplyAOEDamage(currentTarget.transform.position);
+            }
         }
     }
 
@@ -192,6 +204,42 @@ public class UnitController : NetworkBehaviour
                 continue;
 
             unit.TakeDamage(aoeDamage);
+        }
+    }
+
+    void ApplyMultiTargetAttack()
+    {
+        Collider[] hits = Physics.OverlapSphere(
+            transform.position,
+            attackRange
+        );
+
+        var enemies = new List<UnitController>();
+
+        foreach (var hit in hits)
+        {
+            UnitController unit = hit.GetComponent<UnitController>();
+            if (unit == null)
+                continue;
+
+            if (unit.teamId == teamId || unit.IsDead())
+                continue;
+
+            enemies.Add(unit);
+        }
+
+        enemies.Sort((a, b) =>
+            Vector3.Distance(transform.position, a.transform.position)
+            .CompareTo(
+                Vector3.Distance(transform.position, b.transform.position)
+            )
+        );
+
+        int count = Mathf.Min(maxTargets, enemies.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            enemies[i].TakeDamage(attackDamage);
         }
     }
 
