@@ -14,15 +14,15 @@ public static class FusionManager
         if (source.unitType != target.unitType)
             return false;
 
-        // Only pawn fusion for now, change this later
-        if (source.unitType != UnitController.UnitType.Pawn) 
+        if (source.unitType == UnitController.UnitType.Queen)
             return false;
 
-        FusePawn(source, target);
+
+        FuseUnit(source, target);
         return true;
     }
 
-    static void FusePawn(UnitController source, UnitController target)
+    static void FuseUnit(UnitController source, UnitController target)
     {
         UnitController survivor = target;
         UnitController consumed = source;
@@ -39,19 +39,28 @@ public static class FusionManager
 
     }
 
-    static void PromotePawn(UnitController pawn)
+    static void PromotePawn(UnitController unit)
     {
-        BoardSlot slot = pawn.CurrentSlot;
-        ulong ownerId = pawn.OwnerClientId;
-        float carriedHp = pawn.GetHP();
-        int teamId = pawn.teamId;
+        BoardSlot slot = unit.CurrentSlot;
+        ulong ownerId = unit.OwnerClientId;
+        float carriedHp = unit.GetHP();
+        int teamId = unit.teamId;
 
         if (slot == null)
             return;
 
-        UnitController.UnitType defaultType = UnitController.UnitType.Rook;
-        int typeId = (int)defaultType;
+        UnitController.UnitType defaultType;
 
+        if (unit.unitType == UnitController.UnitType.Pawn)
+        {
+            defaultType = UnitController.UnitType.Rook;
+        }
+        else
+        {
+            defaultType = UnitController.UnitType.Queen;
+        }
+
+        int typeId = (int)defaultType;
         GameObject prefab =
             GamePhaseManager.Instance.GetBattlePrefab(typeId);
 
@@ -61,10 +70,10 @@ public static class FusionManager
             return;
         }
 
-        Vector3 spawnPos = pawn.transform.position;
-        Quaternion spawnRot = pawn.transform.rotation;
+        Vector3 spawnPos = unit.transform.position;
+        Quaternion spawnRot = unit.transform.rotation;
 
-        pawn.GetComponent<Unity.Netcode.NetworkObject>().Despawn(true);
+        unit.GetComponent<Unity.Netcode.NetworkObject>().Despawn(true);
 
         GameObject upgraded = Object.Instantiate(
             prefab,
@@ -83,16 +92,19 @@ public static class FusionManager
 
         controller.SnapToSlot(slot);
 
-        GamePhaseManager.Instance.ShowPromotionUIClientRpc(
-            controller.NetworkObjectId,
-            new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
+        if (unit.unitType == UnitController.UnitType.Pawn)
+        {
+            GamePhaseManager.Instance.ShowPromotionUIClientRpc(
+                controller.NetworkObjectId,
+                new ClientRpcParams
                 {
-                    TargetClientIds = new[] { ownerId }
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new[] { ownerId }
+                    }
                 }
-            }
-        );
+            );
+        }
     }
 
 }
