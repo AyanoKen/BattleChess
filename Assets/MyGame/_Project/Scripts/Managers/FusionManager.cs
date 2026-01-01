@@ -43,18 +43,17 @@ public static class FusionManager
     {
         BoardSlot slot = pawn.CurrentSlot;
         ulong ownerId = pawn.OwnerClientId;
+        float carriedHp = pawn.GetHP();
+        int teamId = pawn.teamId;
 
         if (slot == null)
             return;
 
-        float carriedHp = pawn.GetHP();
-        int teamId = pawn.teamId;
-
-        UnitController.UnitType newType = UnitController.UnitType.Rook;
-        int newTypeId = (int)newType;
+        UnitController.UnitType defaultType = UnitController.UnitType.Rook;
+        int typeId = (int)defaultType;
 
         GameObject prefab =
-            GamePhaseManager.Instance.GetBattlePrefab(newTypeId);
+            GamePhaseManager.Instance.GetBattlePrefab(typeId);
 
         if (prefab == null)
         {
@@ -74,7 +73,7 @@ public static class FusionManager
         );
 
         var controller = upgraded.GetComponent<UnitController>();
-        controller.unitType = newType;
+        controller.unitType = defaultType;
         controller.fusionCount = 0;
         controller.SetHP(carriedHp + controller.maxHP);
         controller.teamId = teamId;
@@ -84,7 +83,16 @@ public static class FusionManager
 
         controller.SnapToSlot(slot);
 
-        Debug.Log("Pawn promoted to Rook");
+        GamePhaseManager.Instance.ShowPromotionUIClientRpc(
+            controller.NetworkObjectId,
+            new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { ownerId }
+                }
+            }
+        );
     }
 
 }

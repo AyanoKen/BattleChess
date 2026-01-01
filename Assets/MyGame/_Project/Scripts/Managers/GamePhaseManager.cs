@@ -19,6 +19,9 @@ public class GamePhaseManager : NetworkBehaviour
     [SerializeField] private float prepDuration = 20f;
     [SerializeField] private float battleDuration = 10f;
 
+    [SerializeField] private float knightHpOffset = 0f; //TODO: DECIDE THESE IN EDITOR
+    [SerializeField] private float bishopHpOffset = 0f;
+
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
             GamePhase.Prep,
@@ -212,5 +215,70 @@ public class GamePhaseManager : NetworkBehaviour
         return battleUnitPrefabs[unitTypeId];
     }
 
+    [ClientRpc]
+    public void ShowPromotionUIClientRpc(
+        ulong unitId,
+        ClientRpcParams rpcParams = default)
+    {
+        PromotionUIManager.Instance.ShowPromotionUI(unitId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitPromotionChoiceServerRpc(
+        ulong unitId,
+        UnitController.UnitType choice)
+    {
+        if (GamePhaseManager.Instance.CurrentPhase.Value
+            != GamePhaseManager.GamePhase.Prep)
+            return;
+
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(unitId, out var obj))
+            return;
+
+        var unit = obj.GetComponent<UnitController>();
+
+        if (choice == UnitController.UnitType.Rook)
+            return;
+
+        ReplaceUnit(unit, choice);
+    }
+
+    void ReplaceUnit(UnitController oldUnit, UnitController.UnitType newType)
+    {
+        BoardSlot slot = oldUnit.CurrentSlot;
+        ulong ownerId = oldUnit.OwnerClientId;
+        float hp = oldUnit.GetHP();
+        int teamId = oldUnit.teamId;
+
+        int typeId = (int)newType;
+        GameObject prefab = GetBattlePrefab(typeId);
+
+        Vector3 pos = oldUnit.transform.position;
+        Quaternion rot = oldUnit.transform.rotation;
+
+        oldUnit.GetComponent<NetworkObject>().Despawn(true);
+
+        GameObject upgraded = Instantiate(prefab, pos, rot);
+        var controller = upgraded.GetComponent<UnitController>();
+
+        upgraded.GetComponent<NetworkObject>()
+            .SpawnWithOwnership(ownerId);
+
+        controller.unitType = newType;
+        controller.fusionCount = 0;
+
+        if (newType == UnitController.UnitType.Knight)
+        {
+            controller.SetHP(hp + knightHpOffset);
+        }
+        else if (newType == UnitController.UnitType.Bishop)
+        {
+            controller.SetHP(hp + bishopHpOffset);
+        }
+        
+        controller.teamId = teamId;
+        controller.SnapToSlot(slot);
+    }
 
 }
