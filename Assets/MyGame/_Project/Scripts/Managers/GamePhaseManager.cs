@@ -103,7 +103,7 @@ public class GamePhaseManager : NetworkBehaviour
         ResolveBattle();
     }
 
-    void ResolveBattle()
+    void ResolveBattle() //TODO: Check for a small sync issue
     {
         foreach (var unit in FindObjectsOfType<UnitController>())
         {

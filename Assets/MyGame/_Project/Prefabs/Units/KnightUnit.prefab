@@ -197,9 +197,14 @@ MonoBehaviour:
   teamId: 0
   unitTypeId: 2
   detectionRadius: 50
-  unitType: 1
+  canMove: 1
+  unitType: 2
+  useAOEOnHit: 0
+  aoeRadius: 2
+  aoeDamage: 20
   CurrentSlot: {fileID: 0}
   fusionCount: 0
+  currentHP: 0
   SourceUnitNetworkId: 0
 --- !u!114 &-8210351636321751378
 MonoBehaviour:

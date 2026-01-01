@@ -23,12 +23,16 @@ public class UnitController : NetworkBehaviour
     public int unitTypeId;
     public float detectionRadius = 50f;
     public bool canMove = true;
-
     public UnitType unitType;
+
+    [Header("Bishop Specific")]
+    public float aoeRadius = 2f;
+    public float aoeDamage = 20f;
 
     [HideInInspector]
     public BoardSlot CurrentSlot;
 
+    [Header("Misc Params")]
     public int fusionCount = 0;
 
     public float currentHP;
@@ -155,6 +159,11 @@ public class UnitController : NetworkBehaviour
 
         attackTimer = attackCooldown;
         currentTarget.TakeDamage(attackDamage);
+
+        if (unitType == UnitType.Bishop)
+        {
+            ApplyAOEDamage(currentTarget.transform.position);
+        }
     }
 
     public void TakeDamage(float dmg)
@@ -163,6 +172,26 @@ public class UnitController : NetworkBehaviour
         if (currentHP <= 0f)
         {
             Die();
+        }
+    }
+
+    public void ApplyAOEDamage(Vector3 center)
+    {
+        Collider[] hits = Physics.OverlapSphere(center, aoeRadius);
+
+        foreach (var hit in hits)
+        {
+            UnitController unit = hit.GetComponent<UnitController>();
+            if (unit == null)
+                continue;
+
+            if (unit.teamId == teamId)
+                continue;
+
+            if (unit == currentTarget)
+                continue;
+
+            unit.TakeDamage(aoeDamage);
         }
     }
 

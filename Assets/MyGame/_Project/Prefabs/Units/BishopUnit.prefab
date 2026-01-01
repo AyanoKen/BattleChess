@@ -191,15 +191,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 100
-  attackDamage: 10
+  attackDamage: 25
   attackRange: 1.8
   attackCooldown: 1.2
   teamId: 0
   unitTypeId: 1
   detectionRadius: 50
-  unitType: 2
+  canMove: 1
+  unitType: 1
+  aoeRadius: 2
+  aoeDamage: 10
   CurrentSlot: {fileID: 0}
   fusionCount: 0
+  currentHP: 0
   SourceUnitNetworkId: 0
 --- !u!114 &-8210351636321751378
 MonoBehaviour:
