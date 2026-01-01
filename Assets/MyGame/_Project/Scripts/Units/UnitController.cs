@@ -6,12 +6,12 @@ public class UnitController : NetworkBehaviour
 {
     public enum UnitType
     {
-        Pawn,
-        Bishop, 
-        Knight, 
-        Rook,
-        Queen,
-        King
+        Pawn, // Melee foot soldier
+        Bishop, // Battle mage, long atk cd, high aoe damage around target
+        Knight, // Tank, basic tank, fast, low damage high hp
+        Rook, // Tank, does not move, 3 hex block
+        Queen, // Solar Mage, does not move, meteors from above
+        King // Does not move, high hp, when 0, game ends. 
     }
 
     [Header("Stats")]
@@ -22,6 +22,7 @@ public class UnitController : NetworkBehaviour
     public int teamId = 0;
     public int unitTypeId;
     public float detectionRadius = 50f;
+    public bool canMove = true;
 
     public UnitType unitType;
 
@@ -63,8 +64,11 @@ public class UnitController : NetworkBehaviour
             != GamePhaseManager.GamePhase.Battle)
             return;
 
-        if (!agent.enabled || !agent.isOnNavMesh)
-            return;
+        if (canMove)
+        {
+            if (agent == null || !agent.enabled || !agent.isOnNavMesh)
+                return;
+        }
 
         if (currentTarget == null || currentTarget.IsDead())
         {
@@ -77,14 +81,21 @@ public class UnitController : NetworkBehaviour
             currentTarget.transform.position
         );
 
-        if (distance > attackRange)
+        if (canMove && agent != null)
         {
-            agent.isStopped = false;
-            agent.SetDestination(currentTarget.transform.position);
+            if (distance > attackRange)
+            {
+                agent.isStopped = false;
+                agent.SetDestination(currentTarget.transform.position);
+            }
+            else
+            {
+                agent.isStopped = true;
+            }
         }
-        else
+
+        if (distance <= attackRange)
         {
-            agent.isStopped = true;
             TryAttack();
         }
     }
@@ -272,6 +283,8 @@ public class UnitController : NetworkBehaviour
         GamePhaseManager.GamePhase newPhase)
     {
         if (!IsServer) return;
+
+        if (!canMove || agent == null) return;
 
         if (newPhase == GamePhaseManager.GamePhase.Battle)
         {
