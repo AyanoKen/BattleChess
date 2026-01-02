@@ -365,7 +365,11 @@ public class UnitController : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (!canMove || agent == null) return;
+        if (!canMove || agent == null)
+        {
+            SnapToNavMesh();
+            return;
+        } 
 
         if (newPhase == GamePhaseManager.GamePhase.Battle)
         {
