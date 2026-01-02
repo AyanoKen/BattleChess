@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
-
+using System.Collections.Generic;
 
 public class GamePhaseManager : NetworkBehaviour
 {
@@ -21,6 +21,8 @@ public class GamePhaseManager : NetworkBehaviour
 
     [SerializeField] private float knightHpOffset = 0f; //TODO: DECIDE THESE IN EDITOR
     [SerializeField] private float bishopHpOffset = 0f;
+
+    private HashSet<ulong> simulatedSourceUnits = new HashSet<ulong>();
 
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
@@ -91,6 +93,8 @@ public class GamePhaseManager : NetworkBehaviour
         PhaseTimer.Value = battleDuration;
         Debug.Log("Battle Phase");
 
+        simulatedSourceUnits.Clear();
+
         SpawnEnemyUnitsOnBoards();
     }
 
@@ -103,8 +107,10 @@ public class GamePhaseManager : NetworkBehaviour
         ResolveBattle();
     }
 
-    void ResolveBattle() //TODO: Check for a small sync issue
+    void ResolveBattle()
     {
+        HashSet<ulong> survivedSources = new HashSet<ulong>();
+
         foreach (var unit in FindObjectsOfType<UnitController>())
         {
             if (unit.SourceUnitNetworkId != 0)
@@ -114,9 +120,23 @@ public class GamePhaseManager : NetworkBehaviour
                 {
                     var realUnit = realObj.GetComponent<UnitController>();
                     realUnit.SetHP(unit.GetHP());
+                    survivedSources.Add(unit.SourceUnitNetworkId);
                 }
 
                 unit.GetComponent<NetworkObject>().Despawn(true);
+            }
+        }
+
+        foreach (ulong sourceId in simulatedSourceUnits)
+        {
+            if (!survivedSources.Contains(sourceId))
+            {
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
+                    .TryGetValue(sourceId, out var realObj))
+                {
+                    var realUnit = realObj.GetComponent<UnitController>();
+                    realUnit.SetHP(-1);
+                }
             }
         }
 
@@ -140,19 +160,15 @@ public class GamePhaseManager : NetworkBehaviour
     {
         BoardManager bm = FindObjectOfType<BoardManager>();
 
+        ulong hostClientId = NetworkManager.ServerClientId;
+        PlayerBoard hostBoard = bm.GetBoardForClient(hostClientId);
+
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            PlayerBoard playerBoard = bm.GetBoardForClient(clientId);
-            if (playerBoard == null)
-                continue;
+            if (clientId == hostClientId)
+                continue; // skip host
 
-            ulong enemyClientId =
-                NetworkManager.Singleton.ConnectedClientsIds
-                    .First(id => id != clientId);
-
-            PlayerBoard enemyBoard =
-                bm.GetBoardForClient(enemyClientId);
-
+            PlayerBoard enemyBoard = bm.GetBoardForClient(clientId);
             if (enemyBoard == null)
                 continue;
 
@@ -162,8 +178,8 @@ public class GamePhaseManager : NetworkBehaviour
             {
                 SpawnEnemyUnit(
                     unitState,
-                    playerBoard,
-                    enemyClientId
+                    hostBoard,
+                    clientId
                 );
             }
         }
@@ -200,6 +216,15 @@ public class GamePhaseManager : NetworkBehaviour
             enemyOwnerId == NetworkManager.ServerClientId ? 0 : 1;
 
         controller.SourceUnitNetworkId = state.sourceUnitId;
+
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(state.sourceUnitId, out var realObj))
+        {
+            var realUnit = realObj.GetComponent<UnitController>();
+            controller.SetHP(realUnit.GetHP());
+        }
+
+        simulatedSourceUnits.Add(controller.SourceUnitNetworkId);
 
         unit.GetComponent<NetworkObject>().Spawn();
     }

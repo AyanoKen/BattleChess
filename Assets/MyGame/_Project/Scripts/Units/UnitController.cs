@@ -110,9 +110,13 @@ public class UnitController : NetworkBehaviour
 
     public void SetHP(float hp)
     {
-        if (hp >= 0)
+        if (hp > 0)
         {
             currentHP = hp;
+        }
+        else
+        {
+            Die();
         }
     }
 
