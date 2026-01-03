@@ -31,6 +31,8 @@ public class UnitDragHandler : NetworkBehaviour
 
         dragging = true;
 
+        SetBoardTileVisibility(true);
+
         if (unitCollider != null)
         {
             unitCollider.enabled = false;
@@ -66,6 +68,8 @@ public class UnitDragHandler : NetworkBehaviour
         if (!IsOwner) return;
 
         dragging = false;
+
+        SetBoardTileVisibility(false);
 
         if (unitCollider != null)
         {
@@ -115,6 +119,21 @@ public class UnitDragHandler : NetworkBehaviour
                 SubmitFusionServerRpc(targetUnit.NetworkObjectId);
             }
             
+        }
+    }
+
+    void SetBoardTileVisibility(bool visible)
+    {
+        foreach (var slot in Object.FindObjectsOfType<BoardSlot>())
+        {
+            if (slot.slotType != BoardSlot.SlotType.Board)
+                continue;
+
+            MeshRenderer mr = slot.GetComponent<MeshRenderer>();
+            if (mr != null)
+            {
+                mr.enabled = visible;
+            }
         }
     }
 
