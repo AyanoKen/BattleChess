@@ -29,9 +29,13 @@ public class CameraController : MonoBehaviour
     void MoveCameraToBoard(PlayerBoard board)
     {
         Camera.main.transform.position =
-            board.transform.position + new Vector3(10, 10, 0);
+            board.transform.position + new Vector3(8, 8, 0);
 
         Camera.main.transform.LookAt(board.transform.position);
+
+        Vector3 euler = Camera.main.transform.eulerAngles;
+        euler.x = 55f;
+        Camera.main.transform.eulerAngles = euler;
     }
 
     void OnPhaseChanged(
@@ -56,12 +60,16 @@ public class CameraController : MonoBehaviour
         {
             if (board.OwnerClientId == NetworkManager.ServerClientId)
             {
-                Vector3 baseOffset = new Vector3(10, 10, 0);
+                Vector3 baseOffset = new Vector3(8, 8, 0);
 
                 Camera.main.transform.position =
                     board.transform.position + baseOffset;
 
                 Camera.main.transform.LookAt(board.transform.position);
+
+                Vector3 euler = Camera.main.transform.eulerAngles;
+                euler.x = 55f;
+                Camera.main.transform.eulerAngles = euler;
 
                 if (localId != NetworkManager.ServerClientId)
                 {
