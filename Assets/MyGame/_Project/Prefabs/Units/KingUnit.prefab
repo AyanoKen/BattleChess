@@ -167,8 +167,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78e54a41483ac134b90fba91609d192d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 1000
-  attackDamage: 10
+  maxHP: 100
+  attackDamage: 0
   attackRange: 1.8
   attackCooldown: 1.2
   teamId: 0
@@ -176,6 +176,9 @@ MonoBehaviour:
   detectionRadius: 50
   canMove: 0
   unitType: 5
+  aoeRadius: 2
+  aoeDamage: 20
+  maxTargets: 3
   CurrentSlot: {fileID: 0}
   fusionCount: 0
   currentHP: 0

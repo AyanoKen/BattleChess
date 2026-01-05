@@ -23,6 +23,7 @@ public class GamePhaseManager : NetworkBehaviour
     [SerializeField] private float bishopHpOffset = 0f;
 
     private HashSet<ulong> simulatedSourceUnits = new HashSet<ulong>();
+    private bool gameOver = false;
 
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
@@ -306,4 +307,24 @@ public class GamePhaseManager : NetworkBehaviour
         controller.SnapToSlot(slot);
     }
 
+    public void OnKingKilled(int deadTeamId)
+    {
+        if(!IsServer || gameOver) return;
+
+        gameOver = true;
+
+        int winningTeamId = deadTeamId == 0 ? 1 : 0;
+
+        Debug.Log($"GAME OVER — Team {winningTeamId} wins (King of team {deadTeamId} died)");
+
+        EndGame(winningTeamId);
+    }
+
+    void EndGame(int winningTeamId)
+    {
+        CurrentPhase.Value = GamePhase.Resolution;
+        PhaseTimer.Value = 0f;
+
+        Debug.Log("Done");
+    }
 }

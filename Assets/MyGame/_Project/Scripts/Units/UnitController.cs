@@ -256,6 +256,13 @@ public class UnitController : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        if (unitType == UnitType.King)
+        {
+            GamePhaseManager.Instance.OnKingKilled(teamId);
+            GetComponent<NetworkObject>().Despawn(true);
+            return;
+        }
+
         GetComponent<NetworkObject>().Despawn(true);
     }
 

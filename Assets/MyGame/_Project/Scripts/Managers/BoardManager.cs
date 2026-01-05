@@ -48,6 +48,8 @@ public class BoardManager : NetworkBehaviour
         boardsByClient.Add(clientId, board);
 
         Debug.Log($"Spawned board for client {clientId}");
+
+        SpawnKing(board, clientId);
     }
 
     Vector3 GetBoardPosition(ulong clientId)
@@ -103,7 +105,30 @@ public class BoardManager : NetworkBehaviour
         unit.transform.position = pos;
     }
 
+    void SpawnKing(PlayerBoard board, ulong ownerClientId)
+    {
+        BoardSlot slot =  board.boardSlots[0];
 
+        int kingTypeId = (int)UnitController.UnitType.King;
+
+        GameObject prefab = GamePhaseManager.Instance.GetBattlePrefab(kingTypeId);
+
+        GameObject king = Instantiate(
+            prefab,
+            slot.SnapPosition,
+            Quaternion.identity
+        );
+
+        UnitController controller = king.GetComponent<UnitController>();
+
+        controller.teamId = ownerClientId == NetworkManager.ServerClientId ? 0 : 1; //HERE: Code will change when increasing num of players
+
+        king.GetComponent<NetworkObject>().SpawnWithOwnership(ownerClientId);
+
+        controller.CurrentSlot = slot;
+
+        controller.SnapToSlot(slot);
+    }
 
     [ClientRpc]
     void EnableNetworkTransformClientRpc(
