@@ -333,16 +333,22 @@ public class GamePhaseManager : NetworkBehaviour
         CurrentPhase.Value = GamePhase.Resolution;
         PhaseTimer.Value = 0f;
 
+        ShowParticlesClientRpc(winningTeamId);
+
+        StartCoroutine(ShowGameOverUIDelayed(winningTeamId));
+
+        Debug.Log("Done");
+    }
+
+    [ClientRpc]
+    void ShowParticlesClientRpc(int winningTeamId)
+    {
         Color endColor = winningTeamId == 0 ? Color.white : Color.black;
 
         foreach (var board in FindObjectsOfType<PlayerBoard>())
         {
             board.EnableParticles(endColor);
         }
-
-        StartCoroutine(ShowGameOverUIDelayed(winningTeamId));
-
-        Debug.Log("Done");
     }
 
     IEnumerator ShowGameOverUIDelayed(int winningTeamId)
