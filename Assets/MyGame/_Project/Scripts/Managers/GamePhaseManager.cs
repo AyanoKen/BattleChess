@@ -54,7 +54,7 @@ public class GamePhaseManager : NetworkBehaviour
 
     void Update()
     {
-        if (!IsServer) return;
+        if (!IsServer || gameOver) return;
 
         if (PhaseTimer.Value > 0f)
         {
@@ -324,6 +324,17 @@ public class GamePhaseManager : NetworkBehaviour
     {
         CurrentPhase.Value = GamePhase.Resolution;
         PhaseTimer.Value = 0f;
+
+        Color endColor = winningTeamId == 0 ? Color.white : Color.black;
+
+        BoardManager bm = FindObjectOfType<BoardManager>();
+        if (bm == null)
+            return;
+
+        foreach (var board in FindObjectsOfType<PlayerBoard>())
+        {
+            board.PlayEndGameParticles(endColor);
+        }
 
         Debug.Log("Done");
     }

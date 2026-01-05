@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using System.Drawing;
 
 public class PlayerBoard : NetworkBehaviour
 {
@@ -9,6 +10,10 @@ public class PlayerBoard : NetworkBehaviour
     public BoardSlot[] benchSlots;
     public BoardSlot[] boardSlots; 
     public BoardSlot[] enemySlots;
+
+    [Header("End Game Particles")]
+    [SerializeField] private ParticleSystem leftEmitter;
+    [SerializeField] private ParticleSystem rightEmitter;
 
     void Awake()
     {
@@ -80,4 +85,21 @@ public class PlayerBoard : NetworkBehaviour
         return state;
     }
 
+    public void EnableParticles(Color color)
+    {
+        PlayEmitter(leftEmitter, color);
+        PlayEmitter(rightEmitter, color);
+    }
+
+    void PlayEmitter(ParticleSystem ps, Color color)
+    {
+        if (ps == null)
+            return;
+
+        var main = ps.main;
+        main.startColor = color;
+
+        ps.gameObject.SetActive(true);
+        ps.Play();
+    }
 }
