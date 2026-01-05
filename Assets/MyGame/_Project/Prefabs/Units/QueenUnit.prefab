@@ -176,7 +176,12 @@ MonoBehaviour:
   detectionRadius: 50
   canMove: 0
   unitType: 4
+  aoeRadius: 2
+  aoeDamage: 20
+  maxTargets: 3
   CurrentSlot: {fileID: 0}
+  teamWhiteMaterial: {fileID: 2100000, guid: da014a7d13a1d364daacde9393f7afd3, type: 2}
+  teamBlackMaterial: {fileID: 2100000, guid: 430d631f44516094c8b930c6211ef192, type: 2}
   fusionCount: 0
   currentHP: 0
   SourceUnitNetworkId: 0

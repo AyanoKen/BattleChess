@@ -234,7 +234,8 @@ public class GamePhaseManager : NetworkBehaviour
 
         simulatedSourceUnits.Add(controller.SourceUnitNetworkId);
 
-        unit.GetComponent<NetworkObject>().Spawn();
+        unit.GetComponent<NetworkObject>()
+            .SpawnWithOwnership(enemyOwnerId);
     }
 
     public GameObject GetBattlePrefab(int unitTypeId)
@@ -333,10 +334,6 @@ public class GamePhaseManager : NetworkBehaviour
         PhaseTimer.Value = 0f;
 
         Color endColor = winningTeamId == 0 ? Color.white : Color.black;
-
-        BoardManager bm = FindObjectOfType<BoardManager>();
-        if (bm == null)
-            return;
 
         foreach (var board in FindObjectsOfType<PlayerBoard>())
         {

@@ -36,6 +36,10 @@ public class UnitController : NetworkBehaviour
     [HideInInspector]
     public BoardSlot CurrentSlot;
 
+    [Header("Team Materials")]
+    [SerializeField] private Material teamWhiteMaterial;
+    [SerializeField] private Material teamBlackMaterial;
+
     [Header("Misc Params")]
     public int fusionCount = 0;
 
@@ -62,6 +66,11 @@ public class UnitController : NetworkBehaviour
         {
             visualYOffset = col.bounds.extents.y;
         }
+    }
+
+    void Start()
+    {
+        ApplyTeamMaterial();
     }
 
     void Update()
@@ -125,6 +134,30 @@ public class UnitController : NetworkBehaviour
         SetHP(currentHP + hp);
     }
 
+    void ApplyTeamMaterial()
+    {
+        if (!IsSpawned)
+            return;
+
+        bool isServerOwned =
+            OwnerClientId == NetworkManager.ServerClientId;
+
+        Material mat = isServerOwned
+            ? teamWhiteMaterial
+            : teamBlackMaterial;
+
+        if (mat == null)
+            return;
+
+        var renderers = GetComponentsInChildren<Renderer>();
+        if (renderers == null || renderers.Length == 0)
+            return;
+
+        foreach (var renderer in renderers)
+        {
+            renderer.material = mat;
+        }
+    }
 
     void FindTarget()
     {

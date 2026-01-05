@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 130606826
+  GlobalObjectIdHash: 651567456
   InScenePlacedSourceGlobalObjectIdHash: 651567456
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -197,7 +197,16 @@ MonoBehaviour:
   teamId: 0
   unitTypeId: 0
   detectionRadius: 50
+  canMove: 1
+  unitType: 0
+  aoeRadius: 2
+  aoeDamage: 20
+  maxTargets: 3
   CurrentSlot: {fileID: 0}
+  teamWhiteMaterial: {fileID: 2100000, guid: da014a7d13a1d364daacde9393f7afd3, type: 2}
+  teamBlackMaterial: {fileID: 2100000, guid: 430d631f44516094c8b930c6211ef192, type: 2}
+  fusionCount: 0
+  currentHP: 0
   SourceUnitNetworkId: 0
 --- !u!114 &-8210351636321751378
 MonoBehaviour:
