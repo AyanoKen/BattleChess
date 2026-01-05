@@ -333,7 +333,7 @@ public class GamePhaseManager : NetworkBehaviour
 
         foreach (var board in FindObjectsOfType<PlayerBoard>())
         {
-            board.PlayEndGameParticles(endColor);
+            board.EnableParticles(endColor);
         }
 
         Debug.Log("Done");
