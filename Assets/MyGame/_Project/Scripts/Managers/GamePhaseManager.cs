@@ -2,6 +2,8 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using TMPro;
+using System.Collections;
 
 public class GamePhaseManager : NetworkBehaviour
 {
@@ -24,6 +26,11 @@ public class GamePhaseManager : NetworkBehaviour
 
     private HashSet<ulong> simulatedSourceUnits = new HashSet<ulong>();
     private bool gameOver = false;
+
+    [Header("Game Over UI")]
+    [SerializeField] private GameObject gameOverImage;
+    [SerializeField] private TMP_Text winText;
+
 
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
@@ -336,6 +343,33 @@ public class GamePhaseManager : NetworkBehaviour
             board.EnableParticles(endColor);
         }
 
+        StartCoroutine(ShowGameOverUIDelayed(winningTeamId));
+
         Debug.Log("Done");
+    }
+
+    IEnumerator ShowGameOverUIDelayed(int winningTeamId)
+    {
+        yield return new WaitForSeconds(5f);
+
+        ShowGameOverUIClientRpc(winningTeamId);
+    }
+
+    [ClientRpc]
+    void ShowGameOverUIClientRpc(int winningTeamId)
+    {
+        if (gameOverImage == null || winText == null)
+            return;
+
+        gameOverImage.SetActive(true);
+
+        if (winningTeamId == 0)
+        {
+            winText.text = "Team White Wins!";
+        }
+        else
+        {
+            winText.text = "Team Black Wins!";
+        }
     }
 }
