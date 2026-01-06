@@ -21,6 +21,13 @@ public class GamePhaseManager : NetworkBehaviour
     [SerializeField] private float prepDuration = 20f;
     [SerializeField] private float battleDuration = 10f;
 
+    [HideInInspector]
+    public float PrepDuration => prepDuration;
+
+    [HideInInspector]
+    public float BattleDuration => battleDuration;
+
+
     [SerializeField] private float knightHpOffset = 0f; //TODO: DECIDE THESE IN EDITOR
     [SerializeField] private float bishopHpOffset = 0f;
 
@@ -30,7 +37,6 @@ public class GamePhaseManager : NetworkBehaviour
     [Header("Game Over UI")]
     [SerializeField] private GameObject gameOverImage;
     [SerializeField] private TMP_Text winText;
-
 
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
