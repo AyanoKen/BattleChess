@@ -210,7 +210,22 @@ public class UnitController : NetworkBehaviour
 
             if (unitType == UnitType.Bishop)
             {
-                ApplyAOEDamage(currentTarget.transform.position);
+                Vector3 from = transform.position + Vector3.up;
+                Vector3 to = currentTarget.transform.position;
+
+                PlayAttackVFXClientRpc(
+                    AttackVFXType.Bishop_Fireball,
+                    from,
+                    to
+                );
+
+                ApplyAOEDamage(to);
+
+                PlayAttackVFXClientRpc(
+                    AttackVFXType.Bishop_AOE_Impact,
+                    Vector3.zero,
+                    to
+                );
             }
         }
     }
@@ -427,5 +442,18 @@ public class UnitController : NetworkBehaviour
         {
             agent.enabled = false;
         }
+    }
+
+    [ClientRpc]
+    void PlayAttackVFXClientRpc(
+        AttackVFXType type,
+        Vector3 from,
+        Vector3 to
+    )
+    {
+        if (VFXManager.Instance == null)
+            return;
+
+        VFXManager.Instance.Play(type, from, to);
     }
 }
