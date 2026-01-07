@@ -169,7 +169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 300
   attackDamage: 20
-  attackRange: 1.8
+  attackRange: 2
   attackCooldown: 2
   teamId: 0
   unitTypeId: 3

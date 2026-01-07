@@ -132,6 +132,7 @@ GameObject:
   m_Component:
   - component: {fileID: 287775639096957926}
   - component: {fileID: 1388540336862368846}
+  - component: {fileID: 3796007007230296132}
   m_Layer: 0
   m_Name: FireBallAOE
   m_TagString: Untagged
@@ -168,3 +169,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 1.5
+--- !u!114 &3796007007230296132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8197878329373195073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d279a57e03e87c5439869ffbc75a816e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startRadius: 0.2
+  endRadius: 1
+  duration: 0.35
+  fadeOut: 1

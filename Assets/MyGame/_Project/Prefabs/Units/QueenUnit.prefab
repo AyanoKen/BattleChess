@@ -171,9 +171,9 @@ MonoBehaviour:
   maxHP: 100
   attackDamage: 200
   attackRange: 50
-  attackCooldown: 5
+  attackCooldown: 6
   teamId: 0
-  unitTypeId: 6
+  unitTypeId: 4
   detectionRadius: 50
   canMove: 0
   unitType: 4

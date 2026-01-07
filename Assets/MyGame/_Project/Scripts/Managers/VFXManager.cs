@@ -11,6 +11,9 @@ public class VFXManager : MonoBehaviour
     [Header("Queen")]
     [SerializeField] private GameObject queenTargetRingPrefab;
 
+    [Header("Rook")]
+    [SerializeField] private GameObject rookShockwavePrefab;
+
     void Awake()
     {
         Instance = this;
@@ -34,6 +37,10 @@ public class VFXManager : MonoBehaviour
 
             case AttackVFXType.Queen_TargetRing:
                 SpawnQueenTargetRing(to);
+                break;
+
+            case AttackVFXType.Rook_Shockwave:
+                SpawnRookShockwave(to);
                 break;
         }
     }
@@ -69,5 +76,14 @@ public class VFXManager : MonoBehaviour
 
         ring.GetComponent<VFXRingDrop>()
             .Init(position);
+    }
+
+    void SpawnRookShockwave(Vector3 position)
+    {
+        Instantiate(
+            rookShockwavePrefab,
+            position,
+            Quaternion.identity
+        );
     }
 }

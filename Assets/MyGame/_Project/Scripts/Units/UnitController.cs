@@ -230,6 +230,16 @@ public class UnitController : NetworkBehaviour
                     to
                 );
             }
+            else if (unitType == UnitType.Rook)
+                {
+                    Vector3 pos = transform.position;
+
+                    PlayAttackVFXClientRpc(
+                        AttackVFXType.Rook_Shockwave,
+                        Vector3.zero,
+                        pos
+                    );
+                }
         }
     }
 

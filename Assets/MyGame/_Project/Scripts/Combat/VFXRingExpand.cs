@@ -12,19 +12,23 @@ public class VFXRingExpand : MonoBehaviour
 
     private Material mat;
     private float timer;
+
     private float fixedYScale;
+    private Transform cachedTransform;
 
     void Awake()
     {
+        cachedTransform = transform;
+
         Renderer r = GetComponent<Renderer>();
         if (r != null)
         {
-            mat = r.material; 
+            mat = r.material;
         }
 
-        fixedYScale = transform.localScale.y;
+        fixedYScale = cachedTransform.localScale.y;
 
-        transform.localScale = new Vector3(
+        cachedTransform.localScale = new Vector3(
             startRadius,
             fixedYScale,
             startRadius
@@ -38,7 +42,7 @@ public class VFXRingExpand : MonoBehaviour
 
         float radius = Mathf.Lerp(startRadius, endRadius, t);
 
-        transform.localScale = new Vector3(
+        cachedTransform.localScale = new Vector3(
             radius,
             fixedYScale,
             radius
