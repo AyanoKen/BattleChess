@@ -155,6 +155,9 @@ public class UnitController : NetworkBehaviour
 
         foreach (var renderer in renderers)
         {
+            if (renderer.GetComponentInParent<IgnoreTeamMaterial>() != null)
+                continue;
+
             renderer.material = mat;
         }
     }
@@ -289,9 +292,25 @@ public class UnitController : NetworkBehaviour
 
         int count = Mathf.Min(maxTargets, enemies.Count);
 
+        PlayAttackVFXClientRpc(
+            AttackVFXType.Queen_SelfPulse,
+            Vector3.zero,
+            Vector3.zero
+        );
+
         for (int i = 0; i < count; i++)
         {
-            enemies[i].TakeDamage(attackDamage);
+            UnitController target = enemies[i];
+
+            Vector3 impactPos = target.transform.position;
+
+            PlayAttackVFXClientRpc(
+                AttackVFXType.Queen_TargetRing,
+                Vector3.zero,
+                impactPos
+            );
+
+            target.TakeDamage(attackDamage);
         }
     }
 
@@ -451,6 +470,15 @@ public class UnitController : NetworkBehaviour
         Vector3 to
     )
     {
+        if (type == AttackVFXType.Queen_SelfPulse)
+        {
+            var pulse = GetComponentInChildren<QueenRingPulse>();
+            if (pulse != null)
+                pulse.Pulse();
+
+            return;
+        }
+
         if (VFXManager.Instance == null)
             return;
 

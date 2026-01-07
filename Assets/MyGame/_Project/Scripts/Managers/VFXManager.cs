@@ -8,6 +8,9 @@ public class VFXManager : MonoBehaviour
     [SerializeField] private GameObject bishopFireballPrefab;
     [SerializeField] private GameObject bishopAOEImpactPrefab;
 
+    [Header("Queen")]
+    [SerializeField] private GameObject queenTargetRingPrefab;
+
     void Awake()
     {
         Instance = this;
@@ -27,6 +30,10 @@ public class VFXManager : MonoBehaviour
 
             case AttackVFXType.Bishop_AOE_Impact:
                 SpawnAOEImpact(to);
+                break;
+
+            case AttackVFXType.Queen_TargetRing:
+                SpawnQueenTargetRing(to);
                 break;
         }
     }
@@ -50,5 +57,17 @@ public class VFXManager : MonoBehaviour
             position,
             Quaternion.identity
         );
+    }
+
+    void SpawnQueenTargetRing(Vector3 position)
+    {
+        GameObject ring = Instantiate(
+            queenTargetRingPrefab,
+            Vector3.zero,
+            Quaternion.identity
+        );
+
+        ring.GetComponent<VFXRingDrop>()
+            .Init(position);
     }
 }

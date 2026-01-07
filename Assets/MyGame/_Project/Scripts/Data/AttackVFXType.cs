@@ -7,5 +7,6 @@ public enum AttackVFXType
     Bishop_AOE_Impact,
     Pawn_Hit,
     Rook_Slam,
-    Queen_Meteor
+    Queen_TargetRing,
+    Queen_SelfPulse
 }

@@ -625,6 +625,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bishopFireballPrefab: {fileID: 6540622675307715482, guid: d8246cca1edcbc040ae40e0f67dd1ef0, type: 3}
   bishopAOEImpactPrefab: {fileID: 8197878329373195073, guid: ed5fb84fa94bee44285c97d6080d9acb, type: 3}
+  queenTargetRingPrefab: {fileID: 8685093424376412694, guid: 3187e7c1eca4ce548974c561ac3b51d0, type: 3}
 --- !u!1 &627468360
 GameObject:
   m_ObjectHideFlags: 0
