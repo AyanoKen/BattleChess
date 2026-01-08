@@ -15,7 +15,7 @@ public class UnitDragHandler : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        cam = Camera.main;
+        cam = null;
         unitCollider = GetComponent<Collider>();
         netTransform = GetComponent<NetworkTransform>();
     }
@@ -53,7 +53,11 @@ public class UnitDragHandler : NetworkBehaviour
             return;
         } 
 
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Camera camera = GetCamera();
+        if (camera == null)
+            return;
+
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         Plane boardPlane = new Plane(Vector3.up, Vector3.zero);
 
         if (boardPlane.Raycast(ray, out float enter))
@@ -81,7 +85,11 @@ public class UnitDragHandler : NetworkBehaviour
             netTransform.enabled = true;
         }
 
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Camera camera = GetCamera();
+        if (camera == null)
+            return;
+
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         int slotIndex = -1;
 
         UnitController targetUnit = null;
@@ -135,6 +143,15 @@ public class UnitDragHandler : NetworkBehaviour
                 mr.enabled = visible;
             }
         }
+    }
+
+    Camera GetCamera()
+    {
+        if (cam == null)
+        {
+            cam = Camera.main;
+        }
+        return cam;
     }
 
     [ServerRpc]
