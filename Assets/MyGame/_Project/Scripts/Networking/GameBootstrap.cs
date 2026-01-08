@@ -21,17 +21,24 @@ public class GameBootstrap : MonoBehaviour
 
     private void OnServerStarted()
     {
-        Debug.Log("Server started");
-
-        // Host loads Main scene
-        NetworkManager.Singleton.SceneManager.LoadScene(
-            "Main",
-            UnityEngine.SceneManagement.LoadSceneMode.Single
-        );
+        Debug.Log("Server started — waiting for client...");
     }
 
     private void OnClientConnected(ulong clientId)
     {
         Debug.Log($"Client connected: {clientId}");
+
+        if (!NetworkManager.Singleton.IsServer)
+            return;
+
+        if (clientId == NetworkManager.ServerClientId)
+            return;
+
+        Debug.Log("All players connected. Loading game scene.");
+
+        NetworkManager.Singleton.SceneManager.LoadScene(
+            "Main",
+            UnityEngine.SceneManagement.LoadSceneMode.Single
+        );
     }
 }
