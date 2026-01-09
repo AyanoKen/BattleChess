@@ -1,18 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UnitHPBar : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private Slider slider;
+
+    UnitController unit;
+
     void Start()
     {
-        
+        unit = GetComponentInParent<UnitController>();
+
+        slider.minValue = 0f;
+        slider.maxValue = unit.maxHP;
+        slider.value = unit.currentHP.Value;
+
+        unit.currentHP.OnValueChanged += OnHPChanged;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnHPChanged(float oldValue, float newValue)
     {
-        
+        slider.value = newValue;
+    }
+
+    void LateUpdate()
+    {
+        if (Camera.main != null)
+            transform.forward = Camera.main.transform.forward;
+    }
+
+    void OnDestroy()
+    {
+        if (unit != null)
+            unit.currentHP.OnValueChanged -= OnHPChanged;
     }
 }
