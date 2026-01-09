@@ -15,6 +15,14 @@ public class SpawnManager : NetworkBehaviour
 
         ulong clientId = rpcParams.Receive.SenderClientId;
 
+        const int pawnCost = 1;
+
+        if (!GamePhaseManager.Instance.HasEnoughGold(clientId, pawnCost))
+        {
+            Debug.Log($"Client {clientId} tried to buy pawn without gold");
+            return;
+        }
+
         BoardManager boardManager = FindObjectOfType<BoardManager>();
         PlayerBoard board = boardManager.GetBoardForClient(clientId);
 
@@ -31,6 +39,7 @@ public class SpawnManager : NetworkBehaviour
             return;
         }
 
+        GamePhaseManager.Instance.SpendGold(clientId, pawnCost);
         SpawnPawn(board, slot);
     }
 

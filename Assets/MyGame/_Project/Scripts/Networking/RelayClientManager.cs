@@ -9,21 +9,29 @@ public class RelayClientManager : MonoBehaviour
 {
     public async Task StartRelayClient(string joinCode)
     {
-        JoinAllocation allocation =
-            await RelayService.Instance.JoinAllocationAsync(joinCode);
+        try
+        {
+            JoinAllocation allocation =
+                await RelayService.Instance.JoinAllocationAsync(joinCode);
 
-        var transport =
-            NetworkManager.Singleton.GetComponent<UnityTransport>();
+            var transport =
+                NetworkManager.Singleton.GetComponent<UnityTransport>();
 
-        transport.SetRelayServerData(
-            allocation.RelayServer.IpV4,
-            (ushort)allocation.RelayServer.Port,
-            allocation.AllocationIdBytes,
-            allocation.Key,
-            allocation.ConnectionData,
-            allocation.HostConnectionData
-        );
+            transport.SetRelayServerData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData,
+                allocation.HostConnectionData
+            );
 
-        NetworkManager.Singleton.StartClient();
+            NetworkManager.Singleton.StartClient();
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.LogError($"Relay join failed: {e.Message}");
+        }
     }
+
 }

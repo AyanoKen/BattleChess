@@ -52,6 +52,27 @@ public class GamePhaseManager : NetworkBehaviour
             NetworkVariableWritePermission.Server
         );
 
+    public NetworkVariable<int> HostGold =
+        new NetworkVariable<int>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+    public NetworkVariable<int> ClientGold =
+        new NetworkVariable<int>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+    NetworkVariable<int> GetGoldVar(ulong clientId)
+    {
+        return clientId == NetworkManager.ServerClientId
+            ? HostGold
+            : ClientGold;
+    }
+
     void Awake()
     {
         Instance = this;
@@ -61,6 +82,9 @@ public class GamePhaseManager : NetworkBehaviour
     {
         if (IsServer)
         {
+            HostGold.Value = 3;
+            ClientGold.Value = 3;
+
             StartPrepPhase();
         }
     }
@@ -118,7 +142,35 @@ public class GamePhaseManager : NetworkBehaviour
         PhaseTimer.Value = 0f;
         Debug.Log("Resolving Battle");
 
+        GrantGoldToPlayers();
+
         ResolveBattle();
+    }
+
+    void GrantGoldToPlayers()
+    {
+        GrantGold(NetworkManager.ServerClientId);
+
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (clientId == NetworkManager.ServerClientId)
+                continue;
+
+            GrantGold(clientId);
+        }
+    }
+
+    void GrantGold(ulong clientId)
+    {
+        var goldVar = GetGoldVar(clientId);
+
+        int currentGold = goldVar.Value;
+        int interest = currentGold / 5;
+        int gained = 1 + interest;
+
+        goldVar.Value += gained;
+
+        Debug.Log($"Client {clientId} gained {gained} gold. Total: {goldVar.Value}");
     }
 
     void ResolveBattle()
@@ -381,4 +433,26 @@ public class GamePhaseManager : NetworkBehaviour
             winText.text = "Team Black Wins!";
         }
     }
+
+    public bool HasEnoughGold(ulong clientId, int amount)
+    {
+        return GetGoldVar(clientId).Value >= amount;
+    }
+
+    public bool SpendGold(ulong clientId, int amount)
+    {
+        var goldVar = GetGoldVar(clientId);
+
+        if (goldVar.Value < amount)
+            return false;
+
+        goldVar.Value -= amount;
+        return true;
+    }
+
+    public int GetGold(ulong clientId)
+    {
+        return GetGoldVar(clientId).Value;
+    }
+
 }
