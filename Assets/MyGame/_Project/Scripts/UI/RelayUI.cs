@@ -15,7 +15,7 @@ public class RelayUI : MonoBehaviour
     {
         hostCodeText.text = "Creating room...";
         string code = await relayHost.StartRelayHost(1);
-        hostCodeText.text = $"Join Code: {code}";
+        hostCodeText.text = $"Code: {code}";
     }
 
     public async void OnJoinClicked()
