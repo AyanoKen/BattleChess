@@ -166,7 +166,7 @@ public class GamePhaseManager : NetworkBehaviour
 
         int currentGold = goldVar.Value;
         int interest = currentGold / 5;
-        int gained = 1 + interest;
+        int gained = 3 + interest;
 
         goldVar.Value += gained;
 
