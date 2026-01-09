@@ -33,7 +33,7 @@ public class GoldUI : MonoBehaviour
 
     void UpdateText(int gold)
     {
-        goldText.text = $"Gold: {gold}";
+        goldText.text = $"{gold}";
     }
 
     void OnDestroy()

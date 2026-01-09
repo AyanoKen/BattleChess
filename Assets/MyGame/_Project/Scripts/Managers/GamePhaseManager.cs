@@ -283,17 +283,17 @@ public class GamePhaseManager : NetworkBehaviour
 
         controller.SourceUnitNetworkId = state.sourceUnitId;
 
+        simulatedSourceUnits.Add(controller.SourceUnitNetworkId);
+
+        unit.GetComponent<NetworkObject>()
+            .SpawnWithOwnership(enemyOwnerId);
+
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
             .TryGetValue(state.sourceUnitId, out var realObj))
         {
             var realUnit = realObj.GetComponent<UnitController>();
             controller.SetHP(realUnit.GetHP());
         }
-
-        simulatedSourceUnits.Add(controller.SourceUnitNetworkId);
-
-        unit.GetComponent<NetworkObject>()
-            .SpawnWithOwnership(enemyOwnerId);
     }
 
     public GameObject GetBattlePrefab(int unitTypeId)

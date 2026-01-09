@@ -42,8 +42,6 @@ public class UnitController : NetworkBehaviour
 
     [Header("Misc Params")]
     public int fusionCount = 0;
-
-    public float currentHP;
     private float attackTimer;
 
     private NavMeshAgent agent;
@@ -54,12 +52,18 @@ public class UnitController : NetworkBehaviour
     [HideInInspector]
     public ulong SourceUnitNetworkId;
 
-    public float GetHP() => currentHP;
+    public NetworkVariable<float> currentHP =
+        new NetworkVariable<float>(
+            0f,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+    public float GetHP() => currentHP.Value;
 
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        currentHP = maxHP;
 
         Collider col = GetComponent<Collider>();
         if (col != null)
@@ -121,7 +125,7 @@ public class UnitController : NetworkBehaviour
     {
         if (hp > 0)
         {
-            currentHP = hp;
+            currentHP.Value = hp;
         }
         else
         {
@@ -131,7 +135,7 @@ public class UnitController : NetworkBehaviour
 
     public void AddHP(float hp)
     {
-        SetHP(currentHP + hp);
+        SetHP(currentHP.Value + hp);
     }
 
     void ApplyTeamMaterial()
@@ -245,8 +249,16 @@ public class UnitController : NetworkBehaviour
 
     public void TakeDamage(float dmg)
     {
-        currentHP -= dmg;
-        if (currentHP <= 0f)
+        if (!IsServer) return;
+
+        currentHP.Value -= dmg;
+
+        if (unitType == UnitType.King)
+        {
+            currentHP.Value = Mathf.Max(currentHP.Value, 0f);
+        }
+
+        if (currentHP.Value <= 0f)
         {
             Die();
         }
@@ -326,7 +338,7 @@ public class UnitController : NetworkBehaviour
 
     public bool IsDead()
     {
-        return currentHP <= 0f;
+        return currentHP.Value <= 0f;
     }
 
     void Die()
@@ -419,6 +431,11 @@ public class UnitController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
+
+        if (SourceUnitNetworkId == 0)
+        {
+            currentHP.Value = maxHP;
+        }
 
         GamePhaseManager.Instance.CurrentPhase.OnValueChanged += OnPhaseChanged;
 
