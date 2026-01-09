@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1440645413
+  GlobalObjectIdHash: 651567456
   InScenePlacedSourceGlobalObjectIdHash: 651567456
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -193,7 +193,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 100
   attackDamage: 10
-  attackRange: 1.8
+  attackRange: 1
   attackCooldown: 1.2
   teamId: 0
   unitTypeId: 0
