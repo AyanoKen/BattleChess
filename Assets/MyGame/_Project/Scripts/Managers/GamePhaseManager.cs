@@ -455,4 +455,64 @@ public class GamePhaseManager : NetworkBehaviour
         return GetGoldVar(clientId).Value;
     }
 
+    public void OnBackToLobbyClicked()
+    {
+        if (NetworkManager.Singleton != null &&
+            NetworkManager.Singleton.IsListening)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
+    }
+
+    void OnEnable()
+    {
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+    }
+
+    void OnDisable()
+    {
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+    }
+
+    void OnClientDisconnected(ulong clientId)
+    {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            if (gameOver)
+                return;
+
+            Debug.Log($"Client {clientId} left the match");
+
+            NotifyOpponentLeftClientRpc();
+            return;
+        }
+
+        if (clientId == NetworkManager.ServerClientId)
+        {
+            Debug.Log("Host disconnected");
+
+            NotifyOpponentLeft(); 
+        }
+    }
+
+    
+    [ClientRpc]
+    void NotifyOpponentLeftClientRpc()
+    {
+        NotifyOpponentLeft();
+    }
+
+    void NotifyOpponentLeft()
+    {
+        if (gameOverImage == null || winText == null)
+            return;
+
+        gameOverImage.SetActive(true);
+
+        winText.text = "Opponent left the game :(";
+    }
+
 }
