@@ -129,6 +129,8 @@ public class UnitController : NetworkBehaviour
         }
     }
 
+    // ---------- Unit HP Functions ----------
+
     public void SetHP(float hp)
     {
         if (hp > 0)
@@ -144,6 +146,42 @@ public class UnitController : NetworkBehaviour
     public void AddHP(float hp)
     {
         SetHP(currentHP.Value + hp);
+    }
+
+    public void TakeDamage(float dmg)
+    {
+        if (!IsServer) return;
+
+        currentHP.Value -= dmg;
+
+        if (unitType == UnitType.King)
+        {
+            currentHP.Value = Mathf.Max(currentHP.Value, 0f);
+        }
+
+        if (currentHP.Value <= 0f)
+        {
+            Die();
+        }
+    }
+
+    public bool IsDead()
+    {
+        return currentHP.Value <= 0f;
+    }
+
+    void Die()
+    {
+        if (!IsServer) return;
+
+        if (unitType == UnitType.King)
+        {
+            GamePhaseManager.Instance.OnKingKilled(teamId);
+            GetComponent<NetworkObject>().Despawn(true);
+            return;
+        }
+
+        GetComponent<NetworkObject>().Despawn(true);
     }
 
     void ApplyTeamMaterial()
@@ -173,6 +211,8 @@ public class UnitController : NetworkBehaviour
             renderer.material = mat;
         }
     }
+
+    // ---------- Unit AI Functions ----------
 
     void FindTarget()
     {
@@ -255,23 +295,6 @@ public class UnitController : NetworkBehaviour
         }
     }
 
-    public void TakeDamage(float dmg)
-    {
-        if (!IsServer) return;
-
-        currentHP.Value -= dmg;
-
-        if (unitType == UnitType.King)
-        {
-            currentHP.Value = Mathf.Max(currentHP.Value, 0f);
-        }
-
-        if (currentHP.Value <= 0f)
-        {
-            Die();
-        }
-    }
-
     public void ApplyAOEDamage(Vector3 center)
     {
         Collider[] hits = Physics.OverlapSphere(center, aoeRadius);
@@ -344,23 +367,26 @@ public class UnitController : NetworkBehaviour
         }
     }
 
-    public bool IsDead()
+    [ClientRpc]
+    void PlayAttackVFXClientRpc(
+        AttackVFXType type,
+        Vector3 from,
+        Vector3 to
+    )
     {
-        return currentHP.Value <= 0f;
-    }
-
-    void Die()
-    {
-        if (!IsServer) return;
-
-        if (unitType == UnitType.King)
+        if (type == AttackVFXType.Queen_SelfPulse)
         {
-            GamePhaseManager.Instance.OnKingKilled(teamId);
-            GetComponent<NetworkObject>().Despawn(true);
+            var pulse = GetComponentInChildren<QueenRingPulse>();
+            if (pulse != null)
+                pulse.Pulse();
+
             return;
         }
 
-        GetComponent<NetworkObject>().Despawn(true);
+        if (VFXManager.Instance == null)
+            return;
+
+        VFXManager.Instance.Play(type, from, to);
     }
 
     // ---------- Placement ----------
@@ -496,28 +522,6 @@ public class UnitController : NetworkBehaviour
         {
             agent.enabled = false;
         }
-    }
-
-    [ClientRpc]
-    void PlayAttackVFXClientRpc(
-        AttackVFXType type,
-        Vector3 from,
-        Vector3 to
-    )
-    {
-        if (type == AttackVFXType.Queen_SelfPulse)
-        {
-            var pulse = GetComponentInChildren<QueenRingPulse>();
-            if (pulse != null)
-                pulse.Pulse();
-
-            return;
-        }
-
-        if (VFXManager.Instance == null)
-            return;
-
-        VFXManager.Instance.Play(type, from, to);
     }
 
     [ClientRpc]
