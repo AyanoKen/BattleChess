@@ -91,6 +91,11 @@ public class UnitController : NetworkBehaviour
                 return;
         }
 
+        if (CurrentSlot.slotType == BoardSlot.SlotType.Bench)
+        {
+            return;
+        }
+
         if (currentTarget == null || currentTarget.IsDead())
         {
             FindTarget();

@@ -1,3 +1,5 @@
+//Script Component on Tiles on the board
+
 using UnityEngine;
 
 public class BoardSlot : MonoBehaviour
