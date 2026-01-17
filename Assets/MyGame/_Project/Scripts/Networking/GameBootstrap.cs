@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 //Script for lobby
 public class GameBootstrap : MonoBehaviour
@@ -41,5 +42,10 @@ public class GameBootstrap : MonoBehaviour
             "Main",
             UnityEngine.SceneManagement.LoadSceneMode.Single
         );
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadScene("Title");
     }
 }
