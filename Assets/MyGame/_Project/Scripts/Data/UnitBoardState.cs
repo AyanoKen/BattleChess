@@ -1,5 +1,6 @@
 using System;
 
+// Public structure for capturing player board state. Used during battle stage
 [Serializable]
 public struct UnitBoardState
 {

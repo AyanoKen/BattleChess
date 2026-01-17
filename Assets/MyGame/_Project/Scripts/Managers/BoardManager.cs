@@ -3,12 +3,16 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode.Components;
 
+// Script for instantiating Boards
 public class BoardManager : NetworkBehaviour
 {
     [SerializeField] private GameObject boardPrefab;
 
     private readonly Dictionary<ulong, PlayerBoard> boardsByClient =
         new Dictionary<ulong, PlayerBoard>();
+
+
+    // ---------- Network Functions ----------
 
     public override void OnNetworkSpawn()
     {
@@ -52,19 +56,32 @@ public class BoardManager : NetworkBehaviour
         SpawnKing(board, clientId);
     }
 
-    Vector3 GetBoardPosition(ulong clientId)
+    void SpawnKing(PlayerBoard board, ulong ownerClientId)
     {
-        if (clientId == NetworkManager.ServerClientId)
-            return Vector3.zero;
+        BoardSlot slot =  board.boardSlots[0];
 
-        return new Vector3(0, 0, 300); 
+        int kingTypeId = (int)UnitController.UnitType.King;
+
+        GameObject prefab = GamePhaseManager.Instance.GetBattlePrefab(kingTypeId);
+
+        GameObject king = Instantiate(
+            prefab,
+            slot.SnapPosition,
+            Quaternion.identity
+        );
+
+        UnitController controller = king.GetComponent<UnitController>();
+
+        controller.teamId = ownerClientId == NetworkManager.ServerClientId ? 0 : 1; //HERE: Code will change when increasing num of players
+
+        king.GetComponent<NetworkObject>().SpawnWithOwnership(ownerClientId);
+
+        controller.CurrentSlot = slot;
+
+        controller.SnapToSlot(slot);
     }
 
-    public PlayerBoard GetBoardForClient(ulong clientId)
-    {
-        boardsByClient.TryGetValue(clientId, out PlayerBoard board);
-        return board;
-    }
+    // ---------- Unit Placement ----------
 
     public void TryPlaceUnit(UnitController unit, int slotIndex)
     {
@@ -105,45 +122,6 @@ public class BoardManager : NetworkBehaviour
         unit.transform.position = pos;
     }
 
-    void SpawnKing(PlayerBoard board, ulong ownerClientId)
-    {
-        BoardSlot slot =  board.boardSlots[0];
-
-        int kingTypeId = (int)UnitController.UnitType.King;
-
-        GameObject prefab = GamePhaseManager.Instance.GetBattlePrefab(kingTypeId);
-
-        GameObject king = Instantiate(
-            prefab,
-            slot.SnapPosition,
-            Quaternion.identity
-        );
-
-        UnitController controller = king.GetComponent<UnitController>();
-
-        controller.teamId = ownerClientId == NetworkManager.ServerClientId ? 0 : 1; //HERE: Code will change when increasing num of players
-
-        king.GetComponent<NetworkObject>().SpawnWithOwnership(ownerClientId);
-
-        controller.CurrentSlot = slot;
-
-        controller.SnapToSlot(slot);
-    }
-
-    [ClientRpc]
-    void EnableNetworkTransformClientRpc(
-        ulong unitNetworkId,
-        ClientRpcParams rpcParams = default)
-    {
-        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
-            .TryGetValue(unitNetworkId, out var netObj))
-            return;
-
-        var netTransform = netObj.GetComponent<NetworkTransform>();
-        if (netTransform != null)
-            netTransform.enabled = true;
-    }
-
     [ClientRpc]
     void RevertUnitClientRpc(
         ulong unitNetworkId,
@@ -170,10 +148,37 @@ public class BoardManager : NetworkBehaviour
         netObj.transform.position = finalPosition;
     }
 
+    // ---------- Helper Functions ----------
+    Vector3 GetBoardPosition(ulong clientId)
+    {
+        if (clientId == NetworkManager.ServerClientId)
+            return Vector3.zero;
+
+        return new Vector3(0, 0, 300); 
+    }
+
+    public PlayerBoard GetBoardForClient(ulong clientId)
+    {
+        boardsByClient.TryGetValue(clientId, out PlayerBoard board);
+        return board;
+    }
+
     public PlayerBoard GetHostBoard()
     {
         return GetBoardForClient(NetworkManager.ServerClientId);
     }
 
+    [ClientRpc]
+    void EnableNetworkTransformClientRpc(
+        ulong unitNetworkId,
+        ClientRpcParams rpcParams = default)
+    {
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .TryGetValue(unitNetworkId, out var netObj))
+            return;
 
+        var netTransform = netObj.GetComponent<NetworkTransform>();
+        if (netTransform != null)
+            netTransform.enabled = true;
+    }
 }

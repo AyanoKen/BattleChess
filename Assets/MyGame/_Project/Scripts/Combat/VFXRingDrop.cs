@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Script for Queen's meteor attack effect
 public class VFXRingDrop : MonoBehaviour
 {
     [SerializeField] private float startHeight = 6f;

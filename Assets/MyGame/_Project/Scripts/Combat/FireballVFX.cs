@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Script for Bishop VFX
 public class FireballVFX : MonoBehaviour
 {
     [SerializeField] private float speed = 12f;

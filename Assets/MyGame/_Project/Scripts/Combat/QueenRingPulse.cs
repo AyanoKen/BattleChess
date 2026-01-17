@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Script for Queen's Ring effect
 public class QueenRingPulse : MonoBehaviour
 {
     [SerializeField] private float pulseDuration = 0.25f;

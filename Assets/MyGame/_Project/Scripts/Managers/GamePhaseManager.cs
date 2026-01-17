@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using System.Collections;
 
+// Script for the Game Manager
 public class GamePhaseManager : NetworkBehaviour
 {
     public static GamePhaseManager Instance;
@@ -27,8 +28,7 @@ public class GamePhaseManager : NetworkBehaviour
     [HideInInspector]
     public float BattleDuration => battleDuration;
 
-
-    [SerializeField] private float knightHpOffset = 0f; //TODO: DECIDE THESE IN EDITOR
+    [SerializeField] private float knightHpOffset = 0f;
     [SerializeField] private float bishopHpOffset = 0f;
 
     private HashSet<ulong> simulatedSourceUnits = new HashSet<ulong>();
@@ -89,6 +89,8 @@ public class GamePhaseManager : NetworkBehaviour
         }
     }
 
+    // ---------- Phase Change logic ----------
+
     void Update()
     {
         if (!IsServer || gameOver) return;
@@ -125,6 +127,8 @@ public class GamePhaseManager : NetworkBehaviour
         Debug.Log("Prep Phase");
     }
 
+    // ---------- Battle Phase Functions ----------
+
     void StartBattlePhase()
     {
         CurrentPhase.Value = GamePhase.Battle;
@@ -135,92 +139,6 @@ public class GamePhaseManager : NetworkBehaviour
 
         SpawnEnemyUnitsOnBoards();
     }
-
-    void StartResolutionPhase()
-    {
-        CurrentPhase.Value = GamePhase.Resolution;
-        PhaseTimer.Value = 0f;
-        Debug.Log("Resolving Battle");
-
-        GrantGoldToPlayers();
-
-        ResolveBattle();
-    }
-
-    void GrantGoldToPlayers()
-    {
-        GrantGold(NetworkManager.ServerClientId);
-
-        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
-        {
-            if (clientId == NetworkManager.ServerClientId)
-                continue;
-
-            GrantGold(clientId);
-        }
-    }
-
-    void GrantGold(ulong clientId)
-    {
-        var goldVar = GetGoldVar(clientId);
-
-        int currentGold = goldVar.Value;
-        int interest = currentGold / 5;
-        int gained = 3 + interest;
-
-        goldVar.Value += gained;
-
-        Debug.Log($"Client {clientId} gained {gained} gold. Total: {goldVar.Value}");
-    }
-
-    void ResolveBattle()
-    {
-        HashSet<ulong> survivedSources = new HashSet<ulong>();
-
-        foreach (var unit in FindObjectsOfType<UnitController>())
-        {
-            if (unit.SourceUnitNetworkId != 0)
-            {
-                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
-                    .TryGetValue(unit.SourceUnitNetworkId, out var realObj))
-                {
-                    var realUnit = realObj.GetComponent<UnitController>();
-                    realUnit.SetHP(unit.GetHP());
-                    survivedSources.Add(unit.SourceUnitNetworkId);
-                }
-
-                unit.GetComponent<NetworkObject>().Despawn(true);
-            }
-        }
-
-        foreach (ulong sourceId in simulatedSourceUnits)
-        {
-            if (!survivedSources.Contains(sourceId))
-            {
-                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
-                    .TryGetValue(sourceId, out var realObj))
-                {
-                    var realUnit = realObj.GetComponent<UnitController>();
-                    realUnit.SetHP(-1);
-                }
-            }
-        }
-
-        RestoreHostUnits();
-        StartPrepPhase();
-    }
-
-    void RestoreHostUnits()
-    {
-        foreach (var unit in FindObjectsOfType<UnitController>())
-        {
-            if (unit.CurrentSlot == null)
-                continue;
-
-            unit.ReturnToSlot();
-        }
-    }
-
 
     void SpawnEnemyUnitsOnBoards()
     {
@@ -307,6 +225,95 @@ public class GamePhaseManager : NetworkBehaviour
         return battleUnitPrefabs[unitTypeId];
     }
 
+    // ---------- Resolution Phase Functions ----------
+
+    void StartResolutionPhase()
+    {
+        CurrentPhase.Value = GamePhase.Resolution;
+        PhaseTimer.Value = 0f;
+        Debug.Log("Resolving Battle");
+
+        GrantGoldToPlayers();
+
+        ResolveBattle();
+    }
+
+    void GrantGoldToPlayers()
+    {
+        GrantGold(NetworkManager.ServerClientId);
+
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (clientId == NetworkManager.ServerClientId)
+                continue;
+
+            GrantGold(clientId);
+        }
+    }
+
+    void GrantGold(ulong clientId)
+    {
+        var goldVar = GetGoldVar(clientId);
+
+        int currentGold = goldVar.Value;
+        int interest = currentGold / 5;
+        int gained = 3 + interest;
+
+        goldVar.Value += gained;
+
+        Debug.Log($"Client {clientId} gained {gained} gold. Total: {goldVar.Value}");
+    }
+
+    void ResolveBattle()
+    {
+        HashSet<ulong> survivedSources = new HashSet<ulong>();
+
+        foreach (var unit in FindObjectsOfType<UnitController>())
+        {
+            if (unit.SourceUnitNetworkId != 0)
+            {
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
+                    .TryGetValue(unit.SourceUnitNetworkId, out var realObj))
+                {
+                    var realUnit = realObj.GetComponent<UnitController>();
+                    realUnit.SetHP(unit.GetHP());
+                    survivedSources.Add(unit.SourceUnitNetworkId);
+                }
+
+                unit.GetComponent<NetworkObject>().Despawn(true);
+            }
+        }
+
+        foreach (ulong sourceId in simulatedSourceUnits)
+        {
+            if (!survivedSources.Contains(sourceId))
+            {
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
+                    .TryGetValue(sourceId, out var realObj))
+                {
+                    var realUnit = realObj.GetComponent<UnitController>();
+                    realUnit.SetHP(-1);
+                }
+            }
+        }
+
+        RestoreHostUnits();
+        StartPrepPhase();
+    }
+
+    void RestoreHostUnits()
+    {
+        foreach (var unit in FindObjectsOfType<UnitController>())
+        {
+            if (unit.CurrentSlot == null)
+                continue;
+
+            unit.ReturnToSlot();
+        }
+    }
+    
+    // ---------- Fusion Logic ----------
+
     [ClientRpc]
     public void ShowPromotionUIClientRpc(
         ulong unitId,
@@ -373,6 +380,8 @@ public class GamePhaseManager : NetworkBehaviour
         controller.SnapToSlot(slot);
     }
 
+    // ---------- Game End Logic ----------
+
     public void OnKingKilled(int deadTeamId)
     {
         if(!IsServer || gameOver) return;
@@ -434,6 +443,8 @@ public class GamePhaseManager : NetworkBehaviour
         }
     }
 
+    // ---------- Player Gold Helper Functions ----------
+
     public bool HasEnoughGold(ulong clientId, int amount)
     {
         return GetGoldVar(clientId).Value >= amount;
@@ -454,6 +465,8 @@ public class GamePhaseManager : NetworkBehaviour
     {
         return GetGoldVar(clientId).Value;
     }
+
+    // ---------- Network Functions ----------
 
     public void OnBackToLobbyClicked()
     {
@@ -498,7 +511,6 @@ public class GamePhaseManager : NetworkBehaviour
         }
     }
 
-    
     [ClientRpc]
     void NotifyOpponentLeftClientRpc()
     {

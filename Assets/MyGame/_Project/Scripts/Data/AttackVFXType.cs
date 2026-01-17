@@ -1,5 +1,6 @@
 using System;
 
+// Public enum for Attack types
 [Serializable]
 public enum AttackVFXType
 {

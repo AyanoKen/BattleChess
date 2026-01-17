@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
+// Script component on the player board prefab
+
 public class PlayerBoard : NetworkBehaviour
 {
     [Header("Bench")]
@@ -64,6 +66,7 @@ public class PlayerBoard : NetworkBehaviour
         return null;
     }
 
+    // Function to capture board state during battle stage
     public List<UnitBoardState> CaptureBoardState()
     {
         List<UnitBoardState> state = new List<UnitBoardState>();
@@ -83,6 +86,8 @@ public class PlayerBoard : NetworkBehaviour
 
         return state;
     }
+
+    // ---------- Particle System ----------
 
     public void EnableParticles(Color color)
     {

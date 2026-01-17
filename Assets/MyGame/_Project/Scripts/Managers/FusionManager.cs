@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
+// Script for fusion logic
 public static class FusionManager
 {
     public static bool TryFuse(UnitController source, UnitController target)
@@ -14,10 +15,10 @@ public static class FusionManager
         if (source.unitType != target.unitType)
             return false;
 
-        if (source.unitType == UnitController.UnitType.Queen)
+        if (source.unitType == UnitController.UnitType.Queen) // Queen doesnt fuse
             return false;
 
-        if (source.unitType == UnitController.UnitType.King)
+        if (source.unitType == UnitController.UnitType.King) // King doesnt fuse
             return false;
 
 

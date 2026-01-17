@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Script for a boom VFX effect. Used for Rook aoe / Bishop aoe
 public class VFXRingExpand : MonoBehaviour
 {
     [Header("Scale")]

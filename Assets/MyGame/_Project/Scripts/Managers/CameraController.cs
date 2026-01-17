@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
+// Script Manager for Camera Movements
 public class CameraController : MonoBehaviour
 {
     void Start()
@@ -11,6 +12,22 @@ public class CameraController : MonoBehaviour
 
         GamePhaseManager.Instance.CurrentPhase.OnValueChanged += OnPhaseChanged;
     }
+
+    void OnPhaseChanged(
+    GamePhaseManager.GamePhase oldPhase,
+    GamePhaseManager.GamePhase newPhase)
+    {
+        if (newPhase == GamePhaseManager.GamePhase.Battle)
+        {
+            MoveCameraToBattleView();
+        }
+        else if (newPhase == GamePhaseManager.GamePhase.Prep)
+        {
+            PositionCamera();
+        }
+    }
+
+    // ---------- Camera position changes ----------
 
     void PositionCamera()
     {
@@ -36,20 +53,6 @@ public class CameraController : MonoBehaviour
         Vector3 euler = Camera.main.transform.eulerAngles;
         euler.x = 55f;
         Camera.main.transform.eulerAngles = euler;
-    }
-
-    void OnPhaseChanged(
-    GamePhaseManager.GamePhase oldPhase,
-    GamePhaseManager.GamePhase newPhase)
-    {
-        if (newPhase == GamePhaseManager.GamePhase.Battle)
-        {
-            MoveCameraToBattleView();
-        }
-        else if (newPhase == GamePhaseManager.GamePhase.Prep)
-        {
-            PositionCamera();
-        }
     }
 
     void MoveCameraToBattleView()
