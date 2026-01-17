@@ -37,6 +37,7 @@ public class GamePhaseManager : NetworkBehaviour
     [Header("Game Over UI")]
     [SerializeField] private GameObject gameOverImage;
     [SerializeField] private TMP_Text winText;
+    [SerializeField] private GameObject escPanel;
 
     public NetworkVariable<GamePhase> CurrentPhase =
         new NetworkVariable<GamePhase>(
@@ -93,6 +94,8 @@ public class GamePhaseManager : NetworkBehaviour
 
     void Update()
     {
+        HandleEscInput();
+
         if (!IsServer || gameOver) return;
 
         if (PhaseTimer.Value > 0f)
@@ -528,4 +531,30 @@ public class GamePhaseManager : NetworkBehaviour
         winText.text = "Opponent left the game :(";
     }
 
+    public void LeaveGame()
+    {
+        if (NetworkManager.Singleton == null)
+            return;
+
+        Debug.Log("Leave Game clicked");
+
+        NetworkManager.Singleton.Shutdown();
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
+    }
+
+    void HandleEscInput()
+    {
+        if (escPanel == null)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (gameOver)
+                return;
+
+            bool isOpen = escPanel.activeSelf;
+            escPanel.SetActive(!isOpen);
+        }
+    }
 }
