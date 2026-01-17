@@ -40,6 +40,10 @@ public static class FusionManager
         {
             PromotePawn(survivor);
         }
+        else
+        {
+            survivor.UpdateFusionCountClientRpc(survivor.fusionCount);
+        }
 
     }
 

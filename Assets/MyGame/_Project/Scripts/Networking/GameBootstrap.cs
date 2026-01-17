@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
+//Script for lobby
 public class GameBootstrap : MonoBehaviour
 {
     private void Start()

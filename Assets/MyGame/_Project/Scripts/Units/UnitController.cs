@@ -91,9 +91,12 @@ public class UnitController : NetworkBehaviour
                 return;
         }
 
-        if (CurrentSlot.slotType == BoardSlot.SlotType.Bench)
+        if (CurrentSlot != null)
         {
-            return;
+            if (CurrentSlot.slotType == BoardSlot.SlotType.Bench)
+            {
+                return;
+            }
         }
 
         if (currentTarget == null || currentTarget.IsDead())
@@ -515,5 +518,15 @@ public class UnitController : NetworkBehaviour
             return;
 
         VFXManager.Instance.Play(type, from, to);
+    }
+
+    [ClientRpc]
+    public void UpdateFusionCountClientRpc(int newFusionCount)
+    {
+        var hpBar = GetComponentInChildren<UnitHPBar>();
+        if (hpBar == null)
+            return;
+
+        hpBar.UpdateFusionCount(newFusionCount);
     }
 }

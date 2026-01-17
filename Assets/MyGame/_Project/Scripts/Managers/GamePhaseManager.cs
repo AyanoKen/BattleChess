@@ -211,6 +211,7 @@ public class GamePhaseManager : NetworkBehaviour
         {
             var realUnit = realObj.GetComponent<UnitController>();
             controller.SetHP(realUnit.GetHP());
+            controller.fusionCount = realUnit.fusionCount;
         }
     }
 

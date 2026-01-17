@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Logic for which VFX to use
 public class VFXManager : MonoBehaviour
 {
     public static VFXManager Instance;

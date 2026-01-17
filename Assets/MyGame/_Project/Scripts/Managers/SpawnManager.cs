@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
+// Script for spawning a pawn from shop
 public class SpawnManager : NetworkBehaviour
 {
     [SerializeField] private GameObject pawnPrefab;
