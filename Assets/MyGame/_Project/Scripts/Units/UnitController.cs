@@ -26,9 +26,13 @@ public class UnitController : NetworkBehaviour
     public bool canMove = true;
     public UnitType unitType;
 
+    [Header("Rook Specific")]
+    public float rookAoeRadius = 2f;
+    public float rookAoeDamage = 10f;
+
     [Header("Bishop Specific")]
-    public float aoeRadius = 2f;
-    public float aoeDamage = 20f;
+    public float bishopAoeRadius = 2f;
+    public float bishopAoeDamage = 20f;
 
     [Header("Queen Specific")]
     public int maxTargets = 3;
@@ -274,7 +278,7 @@ public class UnitController : NetworkBehaviour
                     to
                 );
 
-                ApplyAOEDamage(to);
+                ApplyAOEDamage(to, bishopAoeRadius, bishopAoeDamage);
 
                 PlayAttackVFXClientRpc(
                     AttackVFXType.Bishop_AOE_Impact,
@@ -286,6 +290,8 @@ public class UnitController : NetworkBehaviour
                 {
                     Vector3 pos = transform.position;
 
+                    ApplyAOEDamage(pos, rookAoeRadius, rookAoeDamage);
+
                     PlayAttackVFXClientRpc(
                         AttackVFXType.Rook_Shockwave,
                         Vector3.zero,
@@ -295,7 +301,7 @@ public class UnitController : NetworkBehaviour
         }
     }
 
-    public void ApplyAOEDamage(Vector3 center)
+    public void ApplyAOEDamage(Vector3 center, float aoeRadius, float aoeDamage)
     {
         Collider[] hits = Physics.OverlapSphere(center, aoeRadius);
 
@@ -533,4 +539,34 @@ public class UnitController : NetworkBehaviour
 
         hpBar.UpdateFusionCount(newFusionCount);
     }
+
+
+    // ---------- Editor Gizmos ----------
+    
+
+    // void OnDrawGizmosSelected()
+    // {
+    //     Gizmos.color = Color.red;
+
+    //     // Attack range
+    //     Gizmos.DrawWireSphere(transform.position, attackRange);
+
+    //     // Detection radius
+    //     Gizmos.color = Color.yellow;
+    //     Gizmos.DrawWireSphere(transform.position, detectionRadius);
+
+    //     // Bishop AOE
+    //     if (unitType == UnitType.Bishop)
+    //     {
+    //         Gizmos.color = Color.blue;
+    //         Gizmos.DrawWireSphere(transform.position, bishopAoeRadius);
+    //     }
+
+    //     // Rook AOE
+    //     if (unitType == UnitType.Rook)
+    //     {
+    //         Gizmos.color = Color.cyan;
+    //         Gizmos.DrawWireSphere(transform.position, rookAoeRadius);
+    //     }
+    // }
 }

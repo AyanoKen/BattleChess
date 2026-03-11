@@ -329,15 +329,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 100
   attackDamage: 25
-  attackRange: 3.5
+  attackRange: 2.5
   attackCooldown: 1.5
   teamId: 0
   unitTypeId: 1
-  detectionRadius: 50
+  detectionRadius: 15
   canMove: 1
   unitType: 1
-  aoeRadius: 1
-  aoeDamage: 10
+  rookAoeRadius: 2
+  rookAoeDamage: 10
+  bishopAoeRadius: 1
+  bishopAoeDamage: 20
   maxTargets: 3
   CurrentSlot: {fileID: 0}
   teamWhiteMaterial: {fileID: 2100000, guid: da014a7d13a1d364daacde9393f7afd3, type: 2}

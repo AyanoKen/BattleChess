@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3848669210
+  GlobalObjectIdHash: 2103466129
   InScenePlacedSourceGlobalObjectIdHash: 2103466129
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -304,15 +304,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 300
   attackDamage: 20
-  attackRange: 2
+  attackRange: 1.5
   attackCooldown: 2
   teamId: 0
   unitTypeId: 3
-  detectionRadius: 50
+  detectionRadius: 15
   canMove: 0
   unitType: 3
-  aoeRadius: 2
-  aoeDamage: 20
+  rookAoeRadius: 1.5
+  rookAoeDamage: 10
+  bishopAoeRadius: 2
+  bishopAoeDamage: 20
   maxTargets: 3
   CurrentSlot: {fileID: 0}
   teamWhiteMaterial: {fileID: 2100000, guid: da014a7d13a1d364daacde9393f7afd3, type: 2}
