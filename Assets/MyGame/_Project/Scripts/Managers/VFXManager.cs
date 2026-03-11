@@ -5,6 +5,14 @@ public class VFXManager : MonoBehaviour
 {
     public static VFXManager Instance;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip bishopFireballSound;
+    [SerializeField] private AudioClip queenAttackSound;
+    [SerializeField] private AudioClip rookShockwaveSound;
+
+
+
     [Header("Bishop")]
     [SerializeField] private GameObject bishopFireballPrefab;
     [SerializeField] private GameObject bishopAOEImpactPrefab;
@@ -30,6 +38,7 @@ public class VFXManager : MonoBehaviour
         {
             case AttackVFXType.Bishop_Fireball:
                 SpawnFireball(from, to);
+                PlaySound(bishopFireballSound);
                 break;
 
             case AttackVFXType.Bishop_AOE_Impact:
@@ -38,10 +47,12 @@ public class VFXManager : MonoBehaviour
 
             case AttackVFXType.Queen_TargetRing:
                 SpawnQueenTargetRing(to);
+                PlaySound(queenAttackSound);
                 break;
 
             case AttackVFXType.Rook_Shockwave:
                 SpawnRookShockwave(to);
+                PlaySound(rookShockwaveSound);
                 break;
         }
     }
@@ -86,5 +97,14 @@ public class VFXManager : MonoBehaviour
             position,
             Quaternion.identity
         );
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip == null || sfxSource == null)
+            return;
+
+        sfxSource.pitch = Random.Range(0.95f, 1.05f);
+        sfxSource.PlayOneShot(clip);
     }
 }
