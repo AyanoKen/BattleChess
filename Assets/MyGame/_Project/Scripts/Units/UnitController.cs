@@ -46,6 +46,9 @@ public class UnitController : NetworkBehaviour
 
     [Header("Misc Params")]
     public int fusionCount = 0;
+
+    [HideInInspector]
+    public bool disableSnapToNavMesh = false;
     private float attackTimer;
 
     private NavMeshAgent agent;
@@ -506,6 +509,16 @@ public class UnitController : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        if (disableSnapToNavMesh)
+        {
+            return;
+        }
+
+        if (CurrentSlot != null && CurrentSlot.slotType == BoardSlot.SlotType.Bench)
+        {
+            return;
+        }
+
         if (!canMove || agent == null)
         {
             SnapToNavMesh();
@@ -542,7 +555,7 @@ public class UnitController : NetworkBehaviour
 
 
     // ---------- Editor Gizmos ----------
-    
+
 
     // void OnDrawGizmosSelected()
     // {

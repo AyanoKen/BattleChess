@@ -12,13 +12,15 @@ public class PlayerBoard : NetworkBehaviour
     public BoardSlot[] boardSlots; 
     public BoardSlot[] enemySlots;
 
+    private BoardSlot[] allSlots;
+
     [Header("End Game Particles")]
     [SerializeField] private ParticleSystem leftEmitter;
     [SerializeField] private ParticleSystem rightEmitter;
 
     void Awake()
     {
-        var allSlots = GetComponentsInChildren<BoardSlot>();
+        allSlots = GetComponentsInChildren<BoardSlot>();
 
         benchSlots = allSlots
             .Where(s => s.slotType == BoardSlot.SlotType.Bench)
@@ -71,7 +73,7 @@ public class PlayerBoard : NetworkBehaviour
     {
         List<UnitBoardState> state = new List<UnitBoardState>();
 
-        foreach (var slot in boardSlots)
+        foreach (var slot in allSlots)
         {
             if (!slot.occupied || slot.currentUnit == null)
                 continue;

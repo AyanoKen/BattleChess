@@ -216,6 +216,22 @@ public class GamePhaseManager : NetworkBehaviour
             controller.SetHP(realUnit.GetHP());
             controller.fusionCount = realUnit.fusionCount;
         }
+
+        // Disable navmesh for bench units. 
+        if (state.slotIndex >= 28 && state.slotIndex <= 35)
+        {
+            var agent = unit.GetComponent<UnityEngine.AI.NavMeshAgent>();
+
+            controller.canMove = false;
+            controller.disableSnapToNavMesh = true;
+
+            if (agent != null)
+            {
+                agent.enabled = false;
+            }
+
+            controller.SnapToSlot(spawnSlot);
+        }
     }
 
     public GameObject GetBattlePrefab(int unitTypeId)
