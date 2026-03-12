@@ -304,8 +304,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 100
-  attackDamage: 200
-  attackRange: 12
+  attackDamage: 100
+  attackRange: 5
   attackCooldown: 6
   teamId: 0
   unitTypeId: 4
@@ -321,6 +321,7 @@ MonoBehaviour:
   teamWhiteMaterial: {fileID: 2100000, guid: da014a7d13a1d364daacde9393f7afd3, type: 2}
   teamBlackMaterial: {fileID: 2100000, guid: 430d631f44516094c8b930c6211ef192, type: 2}
   fusionCount: 0
+  disableSnapToNavMesh: 0
   SourceUnitNetworkId: 0
   currentHP:
     m_InternalValue: 0
@@ -368,6 +369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverHeight: 2.2
+  rangeIndicatorPrefab: {fileID: 6852202951973914291, guid: ae45e3da0f0ad3a40b6d449f74416f6d, type: 3}
 --- !u!1001 &3496557458064019064
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -6,6 +6,11 @@ public class UnitDragHandler : NetworkBehaviour
 {
     [SerializeField] private float hoverHeight = 2.2f;
 
+    [SerializeField] private GameObject rangeIndicatorPrefab;
+
+    private GameObject activeRangeIndicator;
+    private float rangeIndicatorTimer;
+
     private Camera cam;
     private bool dragging;
     private Collider unitCollider;
@@ -46,6 +51,22 @@ public class UnitDragHandler : NetworkBehaviour
 
     void Update()
     {
+        if (IsOwner && Input.GetMouseButtonDown(1))
+        {
+            TryShowRange();
+        }
+
+        if (activeRangeIndicator != null)
+        {
+            rangeIndicatorTimer -= Time.deltaTime;
+
+            if (rangeIndicatorTimer <= 0f)
+            {
+                Destroy(activeRangeIndicator);
+                activeRangeIndicator = null;
+            }
+        }
+
         if (!dragging || !IsOwner) return;
 
         if (GamePhaseManager.Instance.CurrentPhase.Value != GamePhaseManager.GamePhase.Prep)
@@ -143,6 +164,50 @@ public class UnitDragHandler : NetworkBehaviour
                 mr.enabled = visible;
             }
         }
+    }
+
+    void TryShowRange()
+    {
+        Camera camera = GetCamera();
+        if (camera == null)
+            return;
+
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+
+        if (!Physics.Raycast(ray, out RaycastHit hit))
+            return;
+
+        if (hit.collider.gameObject != gameObject)
+            return;
+
+        UnitController unit = GetComponent<UnitController>();
+        if (unit == null)
+            return;
+
+        ShowRange(unit.attackRange);
+    }
+
+    void ShowRange(float range)
+    {
+        if (rangeIndicatorPrefab == null)
+            return;
+
+        if (activeRangeIndicator != null)
+            Destroy(activeRangeIndicator);
+
+        Vector3 pos = transform.position;
+        pos.y -= 0.5f;
+
+        activeRangeIndicator = Instantiate(
+            rangeIndicatorPrefab,
+            pos,
+            Quaternion.identity
+        );
+
+        activeRangeIndicator.transform.localScale =
+            new Vector3(range * 2f, 0.01f, range * 2f);
+
+        rangeIndicatorTimer = 1f;
     }
 
     Camera GetCamera()

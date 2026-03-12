@@ -240,6 +240,12 @@ public class UnitController : NetworkBehaviour
             if (unit == this || unit.IsDead() || unit.teamId == teamId)
                 continue;
 
+            if (unit.disableSnapToNavMesh)
+                continue;
+
+            if (CurrentSlot != null && CurrentSlot.slotType == BoardSlot.SlotType.Bench)
+                continue;
+
             float dist = Vector3.Distance(
                 transform.position,
                 unit.transform.position
